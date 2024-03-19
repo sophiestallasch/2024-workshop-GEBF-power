@@ -1,0 +1,85 @@
+---
+title: "Workshop: Power Analysis for Experimental Designs in R with the PowerUpR Package"
+author: 
+    name: Sophie E. Stallasch | University of Potsdam 
+
+bibliography: references.bib
+
+---
+
+&nbsp;  
+Welcome to the introductory workshop on power analysis for single- and multilevel randomized trials (RTs) in R at the "Nachwuchstagung" of the GEBF 2024 at the University of Potsdam, taking place on March 21, 2024!
+
+This online tutorial illustrates diverse application scenarios and offers corresponding exercises to perform power analysis with the **PowerUpR** package [@PowerUpR]. In this two-part workshop, you learn the basic steps to follow when designing... 
+
+- [**PART I**: Single-level designs](single-level.qmd) ... simple individually randomized trials (IRTs) 
+
+- [**PART II**: Multilevel designs](multilevel.qmd) ... more complex two- and three-level cluster randomized trials (CRTs)  
+
+
+
+
+
+
+## Setup
+
+First of all, check that you have the latest version of R and RStudio.
+
+You can install the latest version of PowerUpR (currently, this is version 1.1.0) from CRAN. Throughout this tutorial, we will also use a bunch of tidyverse [@tidyverse] functions, as well as the kableExtra package [@kableExtra], so make sure you have installed these packages (for details on the versions used here, see the section "Session Info" below).
+
+```{r}
+#| warning: false
+#| message: false
+
+
+# -- required packages
+pkg <- c("PowerUpR", "tidyverse", "kableExtra")
+
+
+# -- load packages (or install from CRAN if not installed)
+invisible(
+  lapply(pkg,
+         function(x) {
+           if (!require(x, character.only = TRUE)) {
+             install.packages(x, dependencies = TRUE)
+             require(x, character.only = TRUE)}
+         }
+  )
+)
+```
+
+## The PowerUpR Package in a Nutshell
+
+PowerUpR is the R implementation of the 'PowerUp!' Excel tool created by @dong2013, which is accessible at the ['Causal Evaluation' website](https://www.causalevaluation.org/power-analysis.html).
+PowerUpR provides functions to conduct three types of power analysis, depending on the desired output and the applied design. Specifically, PowerUpR offers power analysis tools to plan individually, multisite, and cluster randomized designs with up to four hierarchical levels. Note that this workshop does not cover multisite trials (MSRTs). However, if you want to learn about power analysis for such designs, you may want to check out my tutorials at <https://sophiestallasch.github.io/2022-workshop-CRT/#Multisite_Trials>).
+
+| Type of power analysis: Output        | IRT functions | 2L-CRT functions | 3L-CRT functions |
+|---------------------------------------|---------------|------------------|------------------|
+| Minimum required sample size (MRSS)   | `mrss.ira()`  | `mrss.cra2()`    | `mrss.cra3()`    |
+| Minimum detectable effect size (MDES) | `mdes.ira()`  | `mdes.cra2()`    | `mdes.cra3()`    |
+| Power                                 | `power.ira()` | `power.cra()`    | `power.cra3()`   |
+
+Go to the [PowerUpR Documentation](https://cran.r-project.org/web/packages/PowerUpR/PowerUpR.pdf) to see details on the arguments etc.
+
+::: callout-tip
+At the ['Causal Evaluation' website](https://www.causalevaluation.org/power-analysis.html), you also find the [PowerUpR Shiny App](https://powerupr.shinyapps.io/index/), which nicely implements (and visualizes) most of the functionality of the PowerUpR package.
+:::
+
+## Worked Example for the Workshop
+
+To illustrate the process of performing power analysis with PowerUpR, we will use the following worked example of an intervention to foster student achievement.
+
+::: {.callout-note appearance="minimal" icon="false"}
+## Worked Example
+
+A research team has programmed a comprehensive learning app. It is meant to function as a multidisciplinary digital learning environment for students in various grade levels in the German school system. Therefore, it can be used to support teaching and learning in manifold achievement domains throughout the entire school career. The researchers aim to experimentally evaluate whether the app actually improves student achievement.
+:::
+
+## Session Info
+
+```{r}
+#| echo: false
+sessionInfo()
+```
+
+

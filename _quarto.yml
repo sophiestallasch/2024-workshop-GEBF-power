@@ -1,0 +1,35 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Power Analysis in R"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Intro
+      - dp.qmd
+      - single-level.qmd
+      - multilevel.qmd
+      
+bibliography: references.bib
+csl: apa.csl
+
+format:
+  html:
+    theme: flatly
+    mainfont: arial
+    css: styles.css
+    toc: true
+    toc-depth: 3
+    toc-expand: true
+    page-layout: full
+    grid: 
+      sidebar-width: 0px
+      body-width: 900px
+      margin-width: 400px
+      gutter-width: 1em
+    highlight-style: allay.theme
+
+editor: visual
+

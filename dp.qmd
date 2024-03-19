@@ -1,0 +1,561 @@
+---
+title: "Design Parameters"
+bibliography: references.bib
+---
+
+```{css, echo=FALSE}
+.panel-tabset .nav-item {
+  font-size: 13pt;
+}
+```
+
+To plan sensitive (i.e., sufficiently powered and precise) RTs on student achievement, reliable estimates of design parameters that adequately mirror the (clustered) variance structure of the intervention's target outcome are critical.
+
+These design parameters include:
+
+-   **Intraclass Correlation Coefficients (ICCs)**\
+    ρ values that quantify achievement differences between clusters
+
+-   **Explained Variances**\
+    *R*^2^ values that quantify the proportions of explained variance by covariates at the various levels
+
+Generally, design parameters should match the peculiarities of the target research context as closely as possible (e.g., the target population of the intervention, the specific hierarchical data structure, and the achievement outcome under investigation). There are multiple resources of empirical values of ρ and *R*^2^. A review of existing international and German research on multilevel design parameters for student achievement can be found in @stallasch2021. A meta-analytic integration of both single- and multilevel *R*^2^ values is provided in @stallasch2023. A useful collection of respective estimates for the United States is the ['Online Intraclass Correlation Database'](http://stateva.ci.northwestern.edu/) created by Larry V. Hedges and colleagues and hosted by the Institute for Policy Research at the Northwestern University.
+
+## Multilevel Design Parameters for the German School Context
+
+In this workshop, we draw on our own compilation of ρ and *R*^2^ values (and corresponding standard errors) for the German school system published in @stallasch2021. Based on three longitudinal German large-scale assessments (NEPS, PISA-I+, and DESI) which provided achievement data across the entire school career (Grades 1 to 12), we generated design parameters that apply to:
+
+-   Several student populations
+
+-   Both two-level (students within schools) and three-level designs (students within classrooms within schools)
+
+-   A broad array of domains
+
+*R*^2^ values at each level are available for three covariate sets:
+
+-   Pretest scores
+
+-   Sociodemographic characteristics (comprising students' gender and migration background, as well as parents' educational attainment, and families' HISEI)
+
+-   The combination thereof
+
+The design parameters are provided via an interactive Excel file (Supplemental Online Material B) that comes with a detailed introduction on the application scopes of the various sets of estimates. This document can be downloaded from the [OSF](https://osf.io/2w8nt/) or the [Journal's website](https://www.tandfonline.com/doi/suppl/10.1080/19345747.2020.1823539?scroll=top).
+
+To facilitate the workflow in R (e.g., to avoid time-consuming and error-prone C&P of estimates), an .rda file that encloses the full compilation of design parameters (as a list of data frames) is shared in [this course's repository on github](https://github.com/sophiestallasch/2022-workshop-CRT) which is ready to be directly loaded:
+
+```{r}
+# load design parameters from github
+load(url("https://github.com/sophiestallasch/2022-workshop-CRT/blob/main/data/multides1.rda?raw=true"))
+```
+
+If you run into problems, [click here](https://github.com/sophiestallasch/2022-workshop-CRT/blob/main/data/multides1.rda?raw=true) to download the data to your local machine and then load it into R.
+
+```{r}
+# inspect list
+summary(multides1)
+```
+
+The list contains 16 data frames, that can be grouped into two broad classes:
+
+-   **Point Estimates and Standard Errors**\
+    Data frames B1, B3, B5, B7, B9, B11, B13, and B15 contain the full sets of (population-specific) empirical estimates of design parameters for each domain, subdomain, and grade, along with their standard errors.
+
+-   **Normative Distributions**\
+    Data frames B2, B4, B6, B8, B10, B12, B14, and B16 (all data frames ending with "\_ND") contain (population-specific) normative distributions (i.e., minimum, 25th percentile, median, 75th percentile, and maximum) of those design parameters summarized across domains and/or grades. These distributions can serve as guesstimates to plan studies whose target domain and/or grade is not covered in @stallasch2021.
+
+### Overview of Data Frames
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:13px;
+  overflow:hidden;padding:1px 2px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:13px;
+  font-weight:normal;overflow:hidden;padding:1px 2px;word-break:normal;}
+.tg .tg-d80r{border-color:#9b9b9b;font-family:Arial, Helvetica, sans-serif !important;font-size:13px;text-align:center;
+  vertical-align:middle}
+.tg .tg-6hvx{border-color:#9b9b9b;font-family:Arial, Helvetica, sans-serif !important;font-size:13px;text-align:left;
+  vertical-align:middle}
+.tg .tg-sp0n{background-color:#efefef;border-color:#9b9b9b;font-family:Arial, Helvetica, sans-serif !important;font-size:13px;
+  text-align:left;vertical-align:middle}
+.tg .tg-sqw7{background-color:#2c3e50;border-color:#9b9b9b;color:#ffffff;font-family:Arial, Helvetica, sans-serif !important;
+  font-size:13px;font-weight:bold;text-align:left;vertical-align:middle}
+.tg .tg-snkp{background-color:#2c3e50;border-color:#9b9b9b;color:#ffffff;font-family:Arial, Helvetica, sans-serif !important;
+  font-size:13px;font-weight:bold;text-align:center;vertical-align:middle}
+.tg .tg-vv2j{background-color:#efefef;border-color:#9b9b9b;font-family:Arial, Helvetica, sans-serif !important;font-size:13px;
+  text-align:center;vertical-align:middle}
+</style>
+<table class="tg" style="undefined;table-layout: fixed; width: 828px">
+<colgroup>
+<col style="width: 165px">
+<col style="width: 210px">
+<col style="width: 41px">
+<col style="width: 210px">
+<col style="width: 95px">
+<col style="width: 60px">
+<col style="width: 75px">
+<col style="width: 55px">
+</colgroup>
+<thead>
+  <tr>
+    <th class="tg-sqw7" rowspan="2">Data frame</th>
+    <th class="tg-sqw7" rowspan="2">Description</th>
+    <th class="tg-sqw7" rowspan="2">Grades</th>
+    <th class="tg-sqw7" rowspan="2">Scope of application</th>
+    <th class="tg-sqw7" rowspan="2">Target design</th>
+    <th class="tg-snkp" colspan="3">Hierarchical structure</th>
+  </tr>
+  <tr>
+    <th class="tg-snkp">L1</th>
+    <th class="tg-snkp">L2</th>
+    <th class="tg-snkp">L3</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-6hvx" rowspan="2">B1_General</td>
+    <td class="tg-6hvx" rowspan="2">Design parameters for the general (total) student population</td>
+    <td class="tg-6hvx">1-10</td>
+    <td class="tg-6hvx" rowspan="2">Nationwide/ across all school types</td>
+    <td class="tg-6hvx">3L-(MS)CRT</td>
+    <td class="tg-d80r">Students</td>
+    <td class="tg-d80r">Classrooms</td>
+    <td class="tg-d80r">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-6hvx">11-12</td>
+    <td class="tg-6hvx">2L-MSIRT/CRT</td>
+    <td class="tg-d80r">Students</td>
+    <td class="tg-d80r">-</td>
+    <td class="tg-d80r">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-sp0n" rowspan="2">B2_General_ND</td>
+    <td class="tg-sp0n" rowspan="2">Normative distributions of B1</td>
+    <td class="tg-sp0n">1-10</td>
+    <td class="tg-sp0n" rowspan="2">Nationwide/ across all school types; target domain and/or grade not covered</td>
+    <td class="tg-sp0n">3L-(MS)CRT</td>
+    <td class="tg-vv2j">Students</td>
+    <td class="tg-vv2j">Classrooms</td>
+    <td class="tg-vv2j">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-sp0n">11-12</td>
+    <td class="tg-sp0n">2L-MSIRT/CRT</td>
+    <td class="tg-vv2j">Students</td>
+    <td class="tg-vv2j">-</td>
+    <td class="tg-vv2j">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-6hvx" rowspan="2">B3_Adjusted</td>
+    <td class="tg-6hvx" rowspan="2">Design parameters for the general (total) student population, adjusted for mean-level differences between school types</td>
+    <td class="tg-6hvx">5-10</td>
+    <td class="tg-6hvx" rowspan="2">1 school type in the non-academic track</td>
+    <td class="tg-6hvx">3L-(MS)CRT</td>
+    <td class="tg-d80r">Students</td>
+    <td class="tg-d80r">Classrooms</td>
+    <td class="tg-d80r">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-6hvx">11-12</td>
+    <td class="tg-6hvx">2L-MSIRT/CRT</td>
+    <td class="tg-d80r">Students</td>
+    <td class="tg-d80r">-</td>
+    <td class="tg-d80r">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-sp0n" rowspan="2">B4_Adjusted_ND</td>
+    <td class="tg-sp0n" rowspan="2">Normative distributions of B3</td>
+    <td class="tg-sp0n">5-10</td>
+    <td class="tg-sp0n" rowspan="2">1 school type in the non-academic track; target domain and/or grade not covered</td>
+    <td class="tg-sp0n">3L-(MS)CRT</td>
+    <td class="tg-vv2j">Students</td>
+    <td class="tg-vv2j">Classrooms</td>
+    <td class="tg-vv2j">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-sp0n">11-12</td>
+    <td class="tg-sp0n">2L-MSIRT/CRT</td>
+    <td class="tg-vv2j">Students</td>
+    <td class="tg-vv2j">-</td>
+    <td class="tg-vv2j">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-6hvx" rowspan="2">B5_Academic</td>
+    <td class="tg-6hvx" rowspan="2">Design parameters for the academic track</td>
+    <td class="tg-6hvx">5-10</td>
+    <td class="tg-6hvx" rowspan="2">Academic track school ("Gymnasium")</td>
+    <td class="tg-6hvx">3L-(MS)CRT</td>
+    <td class="tg-d80r">Students</td>
+    <td class="tg-d80r">Classrooms</td>
+    <td class="tg-d80r">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-6hvx">11-12</td>
+    <td class="tg-6hvx">2L-MSIRT/CRT</td>
+    <td class="tg-d80r">Students</td>
+    <td class="tg-d80r">-</td>
+    <td class="tg-d80r">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-sp0n" rowspan="2">B6_Academic_ND</td>
+    <td class="tg-sp0n" rowspan="2">Normative distributions of B5</td>
+    <td class="tg-sp0n">5-10</td>
+    <td class="tg-sp0n" rowspan="2">Academic track school ("Gymnasium"); target domain and/or grade not covered</td>
+    <td class="tg-sp0n">3L-(MS)CRT</td>
+    <td class="tg-vv2j">Students</td>
+    <td class="tg-vv2j">Classrooms</td>
+    <td class="tg-vv2j">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-sp0n">11-12</td>
+    <td class="tg-sp0n">2L-MSIRT/CRT</td>
+    <td class="tg-vv2j">Students</td>
+    <td class="tg-vv2j">-</td>
+    <td class="tg-vv2j">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-6hvx" rowspan="2">B7_Non-Academic</td>
+    <td class="tg-6hvx" rowspan="2">Design parameters for the non-academic track</td>
+    <td class="tg-6hvx">5-10</td>
+    <td class="tg-6hvx" rowspan="2">2+ different school types in the non-academic track</td>
+    <td class="tg-6hvx">3L-(MS)CRT</td>
+    <td class="tg-d80r">Students</td>
+    <td class="tg-d80r">Classrooms</td>
+    <td class="tg-d80r">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-6hvx">11-12</td>
+    <td class="tg-6hvx">2L-MSIRT/CRT</td>
+    <td class="tg-d80r">Students</td>
+    <td class="tg-d80r">-</td>
+    <td class="tg-d80r">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-sp0n" rowspan="2">B8_Non-Academic_ND</td>
+    <td class="tg-sp0n" rowspan="2">Normative distributions of B7</td>
+    <td class="tg-sp0n">5-10</td>
+    <td class="tg-sp0n" rowspan="2">2+ different school types in the non-academic track; target domain and/or grade not covered</td>
+    <td class="tg-sp0n">3L-(MS)CRT</td>
+    <td class="tg-vv2j">Students</td>
+    <td class="tg-vv2j">Classrooms</td>
+    <td class="tg-vv2j">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-sp0n">11-12</td>
+    <td class="tg-sp0n">2L-MSIRT/CRT</td>
+    <td class="tg-vv2j">Students</td>
+    <td class="tg-vv2j">-</td>
+    <td class="tg-vv2j">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-6hvx">B9_General-2l</td>
+    <td class="tg-6hvx">Design parameters for the general (total) student population; for two-level designs</td>
+    <td class="tg-6hvx">1-10</td>
+    <td class="tg-6hvx">Nationwide/ across all school types</td>
+    <td class="tg-6hvx">2L-MSIRT/CRT</td>
+    <td class="tg-d80r">Students</td>
+    <td class="tg-d80r">-</td>
+    <td class="tg-d80r">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-sp0n">B10_General-2l_ND</td>
+    <td class="tg-sp0n">Normative distributions of B9</td>
+    <td class="tg-sp0n">1-10</td>
+    <td class="tg-sp0n">Nationwide/ across all school types; target domain and/or grade not covered</td>
+    <td class="tg-sp0n">2L-MSIRT/CRT</td>
+    <td class="tg-vv2j">Students</td>
+    <td class="tg-vv2j">-</td>
+    <td class="tg-vv2j">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-6hvx">B11_Adjusted-2l</td>
+    <td class="tg-6hvx">Design parameters for the general (total) student population, adjusted for mean-level differences between school types; for two-level designs</td>
+    <td class="tg-6hvx">5-10</td>
+    <td class="tg-6hvx">1 school type in the non-academic track</td>
+    <td class="tg-6hvx">2L-MSIRT/CRT</td>
+    <td class="tg-d80r">Students</td>
+    <td class="tg-d80r">-</td>
+    <td class="tg-d80r">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-sp0n">B12_Adjusted-2l_ND</td>
+    <td class="tg-sp0n">Normative distributions of B11</td>
+    <td class="tg-sp0n">5-10</td>
+    <td class="tg-sp0n">1 school type in the   non-academic track; target domain and/or grade not covered</td>
+    <td class="tg-sp0n">2L-MSIRT/CRT</td>
+    <td class="tg-vv2j">Students</td>
+    <td class="tg-vv2j">-</td>
+    <td class="tg-vv2j">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-6hvx">B13_Academic-2l</td>
+    <td class="tg-6hvx">Design parameters for the academic track; for two-level designs</td>
+    <td class="tg-6hvx">5-10</td>
+    <td class="tg-6hvx">Academic track school ("Gymnasium")</td>
+    <td class="tg-6hvx">2L-MSIRT/CRT</td>
+    <td class="tg-d80r">Students</td>
+    <td class="tg-d80r">-</td>
+    <td class="tg-d80r">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-sp0n">B14_Academic-2l_ND</td>
+    <td class="tg-sp0n">Normative distributions of B13</td>
+    <td class="tg-sp0n">5-10</td>
+    <td class="tg-sp0n">Academic track school ("Gymnasium"); target domain and/or grade not covered</td>
+    <td class="tg-sp0n">2L-MSIRT/CRT</td>
+    <td class="tg-vv2j">Students</td>
+    <td class="tg-vv2j">-</td>
+    <td class="tg-vv2j">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-6hvx">B15_Non-Academic-2l</td>
+    <td class="tg-6hvx">Design parameters for the non-academic track; for two-level designs</td>
+    <td class="tg-6hvx">5-10</td>
+    <td class="tg-6hvx">2+ different school types in the non-academic track</td>
+    <td class="tg-6hvx">2L-MSIRT/CRT</td>
+    <td class="tg-d80r">Students</td>
+    <td class="tg-d80r">-</td>
+    <td class="tg-d80r">Schools</td>
+  </tr>
+  <tr>
+    <td class="tg-sp0n">B16_Non-Academic-2l_ND</td>
+    <td class="tg-sp0n">Normative distributions of B15</td>
+    <td class="tg-sp0n">5-10</td>
+    <td class="tg-sp0n">2+ different school types in the   non-academic track; target domain and/or grade not covered</td>
+    <td class="tg-sp0n">2L-MSIRT/CRT</td>
+    <td class="tg-vv2j">Students</td>
+    <td class="tg-vv2j">-</td>
+    <td class="tg-vv2j">Schools</td>
+  </tr>
+</tbody>
+</table>
+
+
+
+
+
+We also created a flow chart to guide the choice of appropriate design parameters as a function of key characteristics of the target intervention.
+
+![](img/flowchart.png)
+
+### Structure of Data Frames
+
+::: panel-tabset
+# Point Estimates and Standard Errors
+
+Data frames that contain the point estimates and standard errors (i.e., B1, B3, B5, B7, B9, B11, B13, and B15) are structured as follows.
+
+| Variable             | Description                                                                                         |
+|-------------|--------------------------------------------------|
+| domain               | Domain of achievement outcome (for details, see section 'Achievement Domains')                      |
+| subdomain            | Subdomain of achievement outcome (for details, see section 'Achievement Domains')                   |
+| grade                | Grade of achievement outcome                                                                        |
+| study                | Large-scale assessment study (and cohort): 'NEPS-SC2', 'NEPS-SC3', 'NEPS-SC4', 'PISA-I+', 'DESI'    |
+| wave                 | Wave of large-scale assessment study                                                                |
+| model                | Hierarchical structure of specified multilevel model: '3l', '2l'                                    |
+| icc_l2.est           | ICC at the classroom level ρ~L2~                                                                    |
+| icc_l2.se            | SE of ICC at the classroom level *SE*(ρ~L2~)                                                        |
+| icc_l3.est           | ICC at the school level ρ~L3~                                                                       |
+| icc_l3.se            | SE of ICC at the school level *SE*(ρ~L3~)                                                           |
+| r2_l1_pretest.est    | Explained variance by a pretest at the student level *R*^2^~L1~                                     |
+| r2_l1_pretest.se     | SE of explained variance by a pretest at the student level *SE*(*R*^2^~L1~)                         |
+| r2_l2_pretest.est    | Explained variance by a pretest at the classroom level *R*^2^~L2~                                   |
+| r2_l2_pretest.se     | SE of explained variance by a pretest at the classroom level *SE*(*R*^2^~L2~)                       |
+| r2_l3_pretest.est    | Explained variance by a pretest at the school level *R*^2^~L3~                                      |
+| r2_l3_pretest.se     | SE of explained variance by a pretest at the school level *SE*(*R*^2^~L3~)                          |
+| r2_l1_ses.est        | Explained variance by sociodemographics at the student level *R*^2^~L1~                             |
+| r2_l1_ses.se         | SE of explained variance by sociodemographics at the student level *SE*(*R*^2^~L1~)                 |
+| r2_l2_ses.est        | Explained variance by sociodemographics at the classroom level *R*^2^~L2~                           |
+| r2_l2_ses.se         | SE of explained variance by sociodemographics at the classroom level *SE*(*R*^2^~L2~)               |
+| r2_l3_ses.est        | Explained variance by sociodemographics at the school level *R*^2^~L3~                              |
+| r2_l3_ses.se         | SE of explained variance by sociodemographics at the school level *SE*(*R*^2^~L3~)                  |
+| r2_l1_pretestses.est | Explained variance by a pretest and sociodemographics at the student level *R*^2^~L1~               |
+| r2_l1_pretestses.se  | SE of explained variance by a pretest and sociodemographics at the student level *SE*(*R*^2^~L1~)   |
+| r2_l2_pretestses.est | Explained variance by a pretest and sociodemographics at the classroom level *R*^2^~L2~             |
+| r2_l2_pretestses.se  | SE of explained variance by a pretest and sociodemographics at the classroom level *SE*(*R*^2^~L2~) |
+| r2_l3_pretestses.est | Explained variance by a pretest and sociodemographics at the school level *R*^2^~L3~                |
+| r2_l3_pretestses.se  | SE of explained variance by a pretest and sociodemographics at the school level *SE*(*R*^2^~L3~)    |
+
+# Normative Distributions
+
+Data frames that contain normative distributions (i.e., B2, B4, B6, B8, B10, B12, B14, and B16) are structured as follows.
+
+| Variable             | Description                                                                                         |
+|-------------|--------------------------------------------------|
+| domain               | Domain of summarized parameters (for details, see section 'Achievement Domains')                    |
+| grade_range          | Grade range of summarized parameters                                                                |
+| statistic            | Summary statistic: 'Minimum', '25th Percentile', 'Median', '75th Percentile', 'Maximum'             |
+| icc_l2.est           | ICC at the classroom level ρ~L2~                                                                    |
+| icc_l2.se            | SE of ICC at the classroom level *SE*(ρ~L2~)                                                        |
+| icc_l3.est           | ICC at the school level ρ~L3~                                                                       |
+| icc_l3.se            | SE of ICC at the school level *SE*(ρ~L3~)                                                           |
+| r2_l1_pretest.est    | Explained variance by a pretest at the student level *R*^2^~L1~                                     |
+| r2_l1_pretest.se     | SE of explained variance by a pretest at the student level *SE*(*R*^2^~L1~)                         |
+| r2_l2_pretest.est    | Explained variance by a pretest at the classroom level *R*^2^~L2~                                   |
+| r2_l2_pretest.se     | SE of explained variance by a pretest at the classroom level *SE*(*R*^2^~L2~)                       |
+| r2_l3_pretest.est    | Explained variance by a pretest at the school level *R*^2^~L3~                                      |
+| r2_l3_pretest.se     | SE of explained variance by a pretest at the school level *SE*(*R*^2^~L3~)                          |
+| r2_l1_ses.est        | Explained variance by sociodemographics at the student level *R*^2^~L1~                             |
+| r2_l1_ses.se         | SE of explained variance by sociodemographics at the student level *SE*(*R*^2^~L1~)                 |
+| r2_l2_ses.est        | Explained variance by sociodemographics at the classroom level *R*^2^~L2~                           |
+| r2_l2_ses.se         | SE of explained variance by sociodemographics at the classroom level *SE*(*R*^2^~L2~)               |
+| r2_l3_ses.est        | Explained variance by sociodemographics at the school level *R*^2^~L3~                              |
+| r2_l3_ses.se         | SE of explained variance by sociodemographics at the school level *SE*(*R*^2^~L3~)                  |
+| r2_l1_pretestses.est | Explained variance by a pretest and sociodemographics at the student level *R*^2^~L1~               |
+| r2_l1_pretestses.se  | SE of explained variance by a pretest and sociodemographics at the student level *SE*(*R*^2^~L1~)   |
+| r2_l2_pretestses.est | Explained variance by a pretest and sociodemographics at the classroom level *R*^2^~L2~             |
+| r2_l2_pretestses.se  | SE of explained variance by a pretest and sociodemographics at the classroom level *SE*(*R*^2^~L2~) |
+| r2_l3_pretestses.est | Explained variance by a pretest and sociodemographics at the school level *R*^2^~L3~                |
+| r2_l3_pretestses.se  | SE of explained variance by a pretest and sociodemographics at the school level *SE*(*R*^2^~L3~)    |
+:::
+
+Note that three-level design parameters (students at L1 within classrooms at L2 within schools at L3) were estimated for grades 1 to 10 only. For grades 11 to 12, no L2 estimates are available as 11th and 12th graders did not attend intact classrooms, but rather the grouping of students varied depending on the subject taught. Therefore, two-level design parameters (students at L1 within schools at L3) were estimated instead. Two-level equivalents for grades 1 to 10 (i.e., ignoring classroom-level clustering) are also provided; you can access them in the data frames labeled with '-2l'.
+
+::: callout-note
+Keep in mind that the top level (which is always the school level) is consistently indicated as '\_l3' across all data frames; irrespective of whether L2 estimates were estimated (i.e., also for two-level designs).
+:::
+
+Detailed information on the provided design parameters and underlying analysis models can be retrieved from @stallasch2021.
+
+### Achievement Domains
+
+The design parameters cover the following achievement domains.
+
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:15px;
+  overflow:hidden;padding:1px 2px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:15px;
+  font-weight:normal;overflow:hidden;padding:1px 2px;word-break:normal;}
+.tg .tg-f88r{background-color:#2c3e50;border-color:#c0c0c0;color:#ffffff;font-family:Arial, Helvetica, sans-serif !important;
+  font-size:15px;font-weight:bold;text-align:left;vertical-align:middle}
+.tg .tg-fzgn{border-color:#c0c0c0;font-family:Arial, Helvetica, sans-serif !important;font-size:15px;text-align:left;
+  vertical-align:middle}
+</style>
+<table class="tg">
+<thead>
+  <tr>
+    <th class="tg-f88r">Domain</th>
+    <th class="tg-f88r">Subdomain</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-fzgn">Mathematics</td>
+    <td class="tg-fzgn">Mathematics</td>
+  </tr>
+  <tr>
+    <td class="tg-fzgn">Science</td>
+    <td class="tg-fzgn">Science</td>
+  </tr>
+  <tr>
+    <td class="tg-fzgn" rowspan="8">Verbal Skills in German (as First Language)</td>
+    <td class="tg-fzgn">Reading Comprehension</td>
+  </tr>
+  <tr>
+    <td class="tg-fzgn">Reading Speed</td>
+  </tr>
+  <tr>
+    <td class="tg-fzgn">Spelling</td>
+  </tr>
+  <tr>
+    <td class="tg-fzgn">Grammar</td>
+  </tr>
+  <tr>
+    <td class="tg-fzgn">Vocabulary</td>
+  </tr>
+  <tr>
+    <td class="tg-fzgn">Writing</td>
+  </tr>
+  <tr>
+    <td class="tg-fzgn">Argumentation</td>
+  </tr>
+  <tr>
+    <td class="tg-fzgn">Listening Comprehension</td>
+  </tr>
+  <tr>
+    <td class="tg-fzgn" rowspan="6">Verbal Skills in English (as Foreign Language)</td>
+    <td class="tg-fzgn">Reading Comprehension</td>
+  </tr>
+  <tr>
+    <td class="tg-fzgn">Text Reconstruction (C-Test)</td>
+  </tr>
+  <tr>
+    <td class="tg-fzgn">Language Awareness: Sociopragmatics</td>
+  </tr>
+  <tr>
+    <td class="tg-fzgn">Language Awareness: Grammar</td>
+  </tr>
+  <tr>
+    <td class="tg-fzgn">Writing</td>
+  </tr>
+  <tr>
+    <td class="tg-fzgn">Listening Comprehension</td>
+  </tr>
+  <tr>
+    <td class="tg-fzgn" rowspan="5">Domain-General Achievement</td>
+    <td class="tg-fzgn">Declarative Metacognition</td>
+  </tr>
+  <tr>
+    <td class="tg-fzgn">ICT Literacy</td>
+  </tr>
+  <tr>
+    <td class="tg-fzgn">Problem Solving</td>
+  </tr>
+  <tr>
+    <td class="tg-fzgn">Basic Cognitive Functions: Perception Speed</td>
+  </tr>
+  <tr>
+    <td class="tg-fzgn">Basic Cognitive Functions: Reasoning</td>
+  </tr>
+</tbody>
+</table>
+
+
+
+
+
+
+Note that the (sub)domain character strings in the data frames are named exactly like shown here. For instance, if we want to filter design parameters for English text reconstruction from data frame B1, we could use the following code.
+
+```{r}
+#| warning: false
+#| message: false
+library(tidyverse)
+library(kableExtra)
+```
+
+```{r}
+# filter English text reconstruction from data frame B1
+eng_ctest <- multides1[["B1_General"]] |>  
+  filter(domain == "Verbal Skills in English (as Foreign Language)", 
+         subdomain == "Text Reconstruction (C-Test)")
+```
+
+However, to avoid to type the full strings, better use pattern matching functions like from the `grep()` family instead that will do the job for you.
+
+```{r}
+# better:
+eng_ctest <- multides1[["B1_General"]] |>  
+  filter(grepl("Eng", domain), 
+         grepl("C-Test", subdomain))
+```
+
+Let's have a look at the filtered design parameters.
+
+```{r}
+eng_ctest |> 
+  # transpose for better readability
+  t() |>  
+  kable() |> 
+  scroll_box(height = "350px")
+```
+
+As can be seen, there are three entries for English text reconstruction as the respective test was administered to students at two time points in the DESI study, namely at the beginning and at the end of grade 9. For the beginning of grade 9, no pretests were available, therefore the corresponding cells are set to `NA`. A third set of estimates is provided here that contains the meta-analytically pooled results across these two time points (as indicated by 'DESI (Pooled)'). Note that this integration strategy (applying a fixed effect model approach) was also adopted for other domains in grade 9 in case multiple design parameters were available (as obtained either from several studies \[as indicated by 'All (Pooled)'\] or from the two time points in DESI).
+
+## Advanced Covariate Selection for Single- and Multilevel Designs
+
+Well-chosen covariates can dramatically boost power and precision in both IRTs and CRTs. Recently, we generated an extensive compilation of single- and multilevel *R*^2^ (and ρ) values for student achievement [@stallasch2023]. Alongside three psychometric heuristics, we analyzed (a) covariate types of varying bandwidth-fidelity, (b) covariate combinations to quantify incremental validities , and (c) covariate time lags of 1–7 years to test potential validity degradation in the covariates. We meta-analyzed the estimates from six quasi-representative German samples, covering various outcome domains and the entire school career. We also used the estimates to simulate precision. We won't use these design parameters in the present workshop. However, feel free to check out our [preprint](https://osf.io/preprints/psyarxiv/5ajmg) and the corresponding Online Supplemental Material for manifold illustrative scenarios of study planning.
+
+

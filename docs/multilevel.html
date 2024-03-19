@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Power Analysis in R - Multilevel Designs</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.10.4/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<script src="site_libs/jquery-3.5.1/jquery.min.js"></script>
+<link href="site_libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet">
+<script src="site_libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet">
+<script src="site_libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Power Analysis in R</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html" rel="" target="">
+ <span class="menu-text">Intro</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./dp.html" rel="" target="">
+ <span class="menu-text">Design Parameters</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./single-level.html" rel="" target="">
+ <span class="menu-text">Single-Level Designs</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./multilevel.html" rel="" target="" aria-current="page">
+ <span class="menu-text">Multilevel Designs</span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools ms-auto">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#illustration-of-the-worked-example" id="toc-illustration-of-the-worked-example" class="nav-link active" data-scroll-target="#illustration-of-the-worked-example">Illustration of the Worked Example</a>
+  <ul class="collapse">
+  <li><a href="#scenario-1-finding-the-minimum-required-sample-size-for-a-3l-crt" id="toc-scenario-1-finding-the-minimum-required-sample-size-for-a-3l-crt" class="nav-link" data-scroll-target="#scenario-1-finding-the-minimum-required-sample-size-for-a-3l-crt">Scenario 1: Finding the Minimum Required Sample Size for a 3L-CRT</a></li>
+  </ul></li>
+  <li><a href="#your-turn" id="toc-your-turn" class="nav-link" data-scroll-target="#your-turn">Your turn!</a>
+  <ul class="collapse">
+  <li><a href="#scenario-2-finding-the-minimum-required-sample-size-for-a-2l-crt" id="toc-scenario-2-finding-the-minimum-required-sample-size-for-a-2l-crt" class="nav-link" data-scroll-target="#scenario-2-finding-the-minimum-required-sample-size-for-a-2l-crt">Scenario 2: Finding the Minimum Required Sample Size for a 2L-CRT</a></li>
+  <li><a href="#scenario-3-computing-the-minimum-detectable-effect-size-for-a-3l-crt" id="toc-scenario-3-computing-the-minimum-detectable-effect-size-for-a-3l-crt" class="nav-link" data-scroll-target="#scenario-3-computing-the-minimum-detectable-effect-size-for-a-3l-crt">Scenario 3: Computing the Minimum Detectable Effect Size for a 3L-CRT</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content column-page-left" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Multilevel Designs</h1>
+<p class="subtitle lead">Cluster Randomized Trials (CRTs)</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="cell">
+<style type="text/css">
+.panel-tabset .nav-item {
+  font-size: 13pt;
+}
+</style>
+</div>
+<p>In a cluster randomized trial (CRT), entire groups of students (e.g., whole schools) are randomly assigned to the experimental groups; likewise, the treatment and control protocols are delivered at the cluster level.</p>
+<p>In this tutorial, you will learn how to perform power analysis for 2L- and 3L-CRT designs. In the 2L-CRT, students at L1 are nested within schools at L2 and entire schools are randomly assigned to the experimental conditions. In the 3L-CRT, students at L1 are nested within classrooms at L2 which are, in turn, nested within schools at L3. Here, randomization/treatment assignment occurs, again, at the top hierarchical school level.</p>
+<section id="illustration-of-the-worked-example" class="level2">
+<h2 class="anchored" data-anchor-id="illustration-of-the-worked-example">Illustration of the Worked Example</h2>
+<p>In the following we will walk through the process of planning a 3L-CRT, as the more general case. Power analysis for a 3L-CRT is basically an extension to power analysis for a 2L-CRT. Therefore, transferring and/or adjusting the demonstrated steps to plan a 2L-CRT is quite straightforward. Later on, in the practical hands-on section, you can check this.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(PowerUpR)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Worked Example
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A research team has programmed a comprehensive learning app. It is meant to function as a multidisciplinary digital learning environment for students in various grade levels in the German school system. Therefore, it can be used to support teaching and learning in manifold achievement domains throughout the entire school career. The researchers aim to experimentally evaluate whether the app actually improves student achievement.</p>
+</div>
+</div>
+<p>After having proven the general efficacy of the apps’s underlying didactic approach by means of an IRT (see <a href="./single-level.html">Single-Level Designs</a>), the research team aims to scale up the intervention and implement it in the regular school routine, as a CRT.</p>
+<section id="scenario-1-finding-the-minimum-required-sample-size-for-a-3l-crt" class="level3">
+<h3 class="anchored" data-anchor-id="scenario-1-finding-the-minimum-required-sample-size-for-a-3l-crt">Scenario 1: Finding the Minimum Required Sample Size for a 3L-CRT</h3>
+<p><em>How many schools are required to detect a certain hypothesized treatment effect, given a specified design?</em></p>
+<p>The research team would like to conduct a 3L-CRT to test whether the app fosters 7th graders reading comprehension in German as first language. According to Table 1 in <span class="citation" data-cites="brunner2023">Brunner et al. (<a href="#ref-brunner2023" role="doc-biblioref">2023</a>)</span>, students in Germany typically show learning gains of <em>d</em> = .27 in their reading skills from Grade 6 to Grade 7. Since the app was programmed with a special focus on reading, the researchers expect to find at least a treatment effect that corresponds to an achievement growth across half a school year. The researchers therefore wonder how an efficient study design which is sensitive to detect <em>MDES</em> = .13 at α = .05 in a two-tailed <em>t</em>-test would look like. The research team performs power analyses to find the required number of schools, under the assumption to sample (on average) 3 classrooms of 20 students from every school.</p>
+<section id="formula" class="level4">
+<h4 class="anchored" data-anchor-id="formula">Formula</h4>
+<p>The number of schools <span class="math inline">\(K\)</span> necessary for a 3L-CRT with randomization/treatment assignment at L3 is computed as <span class="citation" data-cites="dong2013">(<a href="#ref-dong2013" role="doc-biblioref">Dong &amp; Maynard, 2013, p. 52</a>)</span>: <span class="math display">\[ K = \left(\frac{M_{K-g^*_{L3}-2}}{MDES}\right)^2\left(\frac{\rho_{L3}(1-R^2_{L3})}{P(1-P)}+\frac{\rho_{L2}(1-R^2_{L2})}{P(1-P)J}+\frac{(1-\rho_{L3}-\rho_{L2})(1-R^2_{L1})}{P(1-P)Jn} \right)\]</span></p>
+<p>with</p>
+<table class="table">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 57%">
+<col style="width: 27%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Definition</th>
+<th>PowerUpR argument</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(M_{K-g^*_{L3}-2}\)</span></td>
+<td>multiplier for a two-tailed test <span class="math inline">\(t_{\alpha/2}+t_{1-\beta}\)</span> with <span class="math inline">\(K-g^*_{L3}-2\)</span> degrees of freedom</td>
+<td><code>power=.80</code>, <code>alpha=.05</code>,<code>two.tailed=TRUE</code></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(MDES\)</span></td>
+<td>minimum detectable effect size</td>
+<td><code>es=.25</code></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(n\)</span></td>
+<td>mean number of students per classroom</td>
+<td><code>n</code></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(J\)</span></td>
+<td>mean number of classrooms per school</td>
+<td><code>J</code></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(K\)</span></td>
+<td>total number of schools</td>
+<td><code>K</code></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(P\)</span></td>
+<td>proportion of sample assigned to treatment <span class="math inline">\(K_{TG}/K\)</span></td>
+<td><code>p=.50</code></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(g^*_{L3}\)</span></td>
+<td>number of school-level covariates</td>
+<td><code>g3=0</code></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\rho_{L2}\)</span></td>
+<td>achievement differences between classrooms</td>
+<td><code>rho2</code></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\rho_{L3}\)</span></td>
+<td>achievement differences between schools</td>
+<td><code>rho3</code></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(R^2_{L1}\)</span></td>
+<td>explained variance at the student level</td>
+<td><code>r21=0</code></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(R^2_{L2}\)</span></td>
+<td>explained variance at the classroom level</td>
+<td><code>r22=0</code></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(R^2_{L3}\)</span></td>
+<td>explained variance at the school level</td>
+<td><code>r23=0</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="design-parameters" class="level4">
+<h4 class="anchored" data-anchor-id="design-parameters">Design Parameters</h4>
+<p>The research team uses the flow chart to find the appropriate design parameters.</p>
+<p><img src="img/s1_3lcrt.png" class="img-fluid"></p>
+<p>Load the design parameter collection and select the relevant estimates.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="fu">url</span>(<span class="st">"https://github.com/sophiestallasch/2022-workshop-CRT/blob/main/data/multides1.rda?raw=true"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># -- choose data frame B1 </span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>dp_s1 <span class="ot">&lt;-</span> multides1[[<span class="st">"B1_General"</span>]] <span class="sc">|&gt;</span> </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># filter German reading comprehension in grade 7</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">grepl</span>(<span class="st">"German"</span>, domain), </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>         <span class="fu">grepl</span>(<span class="st">"Reading Comp"</span>, subdomain)) <span class="sc">|&gt;</span> </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(grade <span class="sc">==</span> <span class="dv">7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s have a look at the ρ and <em>R</em><sup>2</sup> values and their standard errors.</p>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dp_s1 <span class="sc">|&gt;</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">contains</span>(<span class="fu">c</span>(<span class="st">"icc"</span>, <span class="st">"r2"</span>))) <span class="sc">|&gt;</span> </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">round</span>(<span class="dv">2</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(), <span class="at">names_to =</span> <span class="st">"Variable"</span>, <span class="at">values_to =</span> <span class="st">"Value"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scroll_box</span>(<span class="at">height =</span> <span class="st">"350px"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:350px; ">
+<table data-quarto-postprocess="true" class="table">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">Variable</th>
+<th data-quarto-table-cell-role="th" style="text-align: right; position: sticky; top: 0; background-color: #FFFFFF;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">icc_l2.est</td>
+<td style="text-align: right;">0.04</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">icc_l2.se</td>
+<td style="text-align: right;">0.01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">icc_l3.est</td>
+<td style="text-align: right;">0.31</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">icc_l3.se</td>
+<td style="text-align: right;">0.02</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">r2_l1_pretest.est</td>
+<td style="text-align: right;">0.21</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">r2_l1_pretest.se</td>
+<td style="text-align: right;">0.01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">r2_l2_pretest.est</td>
+<td style="text-align: right;">0.65</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">r2_l2_pretest.se</td>
+<td style="text-align: right;">0.09</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">r2_l3_pretest.est</td>
+<td style="text-align: right;">0.94</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">r2_l3_pretest.se</td>
+<td style="text-align: right;">0.02</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">r2_l1_ses.est</td>
+<td style="text-align: right;">0.02</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">r2_l1_ses.se</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">r2_l2_ses.est</td>
+<td style="text-align: right;">0.40</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">r2_l2_ses.se</td>
+<td style="text-align: right;">0.15</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">r2_l3_ses.est</td>
+<td style="text-align: right;">0.85</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">r2_l3_ses.se</td>
+<td style="text-align: right;">0.04</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">r2_l1_pretestses.est</td>
+<td style="text-align: right;">0.22</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">r2_l1_pretestses.se</td>
+<td style="text-align: right;">0.01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">r2_l2_pretestses.est</td>
+<td style="text-align: right;">0.74</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">r2_l2_pretestses.se</td>
+<td style="text-align: right;">0.08</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">r2_l3_pretestses.est</td>
+<td style="text-align: right;">0.97</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">r2_l3_pretestses.se</td>
+<td style="text-align: right;">0.02</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+</div>
+</section>
+<section id="power-analysis" class="level4">
+<h4 class="anchored" data-anchor-id="power-analysis">Power Analysis</h4>
+<section id="basline-simple-unconditional-design" class="level5">
+<h5 class="anchored" data-anchor-id="basline-simple-unconditional-design">Basline: Simple unconditional design</h5>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>d1<span class="fl">.0</span> <span class="ot">&lt;-</span> <span class="fu">mrss.cra3</span>(<span class="at">power=</span>.<span class="dv">80</span>, <span class="at">alpha=</span>.<span class="dv">05</span>, <span class="at">two.tailed=</span><span class="cn">TRUE</span>,</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">n =</span> <span class="dv">20</span>, <span class="at">J =</span> <span class="dv">3</span>, <span class="at">K0 =</span> <span class="dv">10</span>, <span class="at">tol=</span>.<span class="dv">10</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">es =</span> .<span class="dv">13</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rho2 =</span> dp_s1<span class="sc">$</span>icc_l2.est, </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rho3 =</span> dp_s1<span class="sc">$</span>icc_l3.est, </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">g3 =</span> <span class="dv">0</span>, <span class="at">r21 =</span> <span class="dv">0</span>, <span class="at">r22 =</span> <span class="dv">0</span>, <span class="at">r23 =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>K = 621 </code></pre>
+</div>
+</div>
+<p>Note that the arguments <code>K0</code> and <code>tol</code> denote the starting value and stopping tolerance for determining K, respectively. <code>K0=10</code> and <code>tol=.10</code> are the default values.</p>
+</section>
+<section id="covariate-adjustment-conditional-design-with" class="level5">
+<h5 class="anchored" data-anchor-id="covariate-adjustment-conditional-design-with">Covariate adjustment: Conditional design with…</h5>
+<p>… 1 pretest at each hierarchical level</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># omit all arguments with an appropriate default value</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>d1<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">mrss.cra3</span>(<span class="at">n =</span> <span class="dv">20</span>, <span class="at">J =</span> <span class="dv">3</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">es =</span> .<span class="dv">13</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rho2 =</span> dp_s1<span class="sc">$</span>icc_l2.est, </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rho3 =</span> dp_s1<span class="sc">$</span>icc_l3.est, </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                  <span class="co"># one covariate at L3</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">g3 =</span> <span class="dv">1</span>, </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>                  <span class="co"># a pretest at L1 that explains 21% of variance at L1 </span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                  <span class="at">r21 =</span> dp_s1<span class="sc">$</span>r2_l1_pretest.est, </span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>                  <span class="co"># a pretest at L2 that explains 65% of variance at L2 </span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                  <span class="at">r22 =</span> dp_s1<span class="sc">$</span>r2_l2_pretest.est,  </span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>                  <span class="co"># a pretest at L3 that explains 94% of variance at L3 </span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>                  <span class="at">r23 =</span> dp_s1<span class="sc">$</span>r2_l3_pretest.est)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>K = 63 </code></pre>
+</div>
+</div>
+<p>… 4 sociodemographic characteristics at each hierarchical level (i.e., gender, migration background, HISEI, educational attainment)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># omit all arguments with an appropriate default value</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>d1<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">mrss.cra3</span>(<span class="at">n =</span> <span class="dv">20</span>, <span class="at">J =</span> <span class="dv">3</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">es =</span> .<span class="dv">13</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rho2 =</span> dp_s1<span class="sc">$</span>icc_l2.est, </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rho3 =</span> dp_s1<span class="sc">$</span>icc_l3.est, </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                  <span class="co"># 4 covariates at L3</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">g3 =</span> <span class="dv">4</span>, </span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                  <span class="co"># sociodemographics at L1 that explain 2% of variance at L1 </span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                  <span class="at">r21 =</span> dp_s1<span class="sc">$</span>r2_l1_ses.est, </span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>                  <span class="co"># sociodemographics at L2 that explain 40% of variance at L2 </span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>                  <span class="at">r22 =</span> dp_s1<span class="sc">$</span>r2_l2_ses.est,  </span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>                  <span class="co"># sociodemographics at L3 that explain 85% of variance at L3 </span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>                  <span class="at">r23 =</span> dp_s1<span class="sc">$</span>r2_l3_ses.est)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>K = 123 </code></pre>
+</div>
+</div>
+<p>… 1 pretest plus 4 sociodemographics at each hierarchical level</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># omit all arguments with an appropriate default value</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>d1<span class="fl">.3</span> <span class="ot">&lt;-</span> <span class="fu">mrss.cra3</span>(<span class="at">n =</span> <span class="dv">20</span>, <span class="at">J =</span> <span class="dv">3</span>,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">es =</span> .<span class="dv">13</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">rho2 =</span> dp_s1<span class="sc">$</span>icc_l2.est, </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">rho3 =</span> dp_s1<span class="sc">$</span>icc_l3.est, </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                <span class="co"># 5 covariates at L3</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">g3 =</span> <span class="dv">5</span>, </span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>                <span class="co"># a pretest and sociodemographics at L1 that explain 22% of variance at L1 </span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">r21 =</span> dp_s1<span class="sc">$</span>r2_l1_pretestses.est, </span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>                <span class="co"># a pretest and sociodemographics at L2 that explain 74% of variance at L2 </span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>                <span class="at">r22 =</span> dp_s1<span class="sc">$</span>r2_l2_pretestses.est,  </span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>                <span class="co"># a pretest and sociodemographics at L3 that explain 97% of variance at L3 </span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>                <span class="at">r23 =</span> dp_s1<span class="sc">$</span>r2_l3_pretestses.est)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>K = 41 </code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You could also update the respective parameter in the list <code>$parms</code> stored in the <code>mrss</code> object and then call the function again with the modified argument.</p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># save baseline design as a new object</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>d1<span class="fl">.3</span>a <span class="ot">&lt;-</span> d1<span class="fl">.0</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># update the covariate arguments</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>d1<span class="fl">.3</span>a<span class="sc">$</span>parms<span class="sc">$</span>g3<span class="ot">=</span><span class="dv">5</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>d1<span class="fl">.3</span>a<span class="sc">$</span>parms<span class="sc">$</span>r21<span class="ot">=</span>dp_s1<span class="sc">$</span>r2_l1_pretestses.est</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>d1<span class="fl">.3</span>a<span class="sc">$</span>parms<span class="sc">$</span>r22<span class="ot">=</span>dp_s1<span class="sc">$</span>r2_l2_pretestses.est</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>d1<span class="fl">.3</span>a<span class="sc">$</span>parms<span class="sc">$</span>r23<span class="ot">=</span>dp_s1<span class="sc">$</span>r2_l3_pretestses.est</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co"># call the function</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>d1<span class="fl">.3</span>a <span class="ot">&lt;-</span> <span class="fu">exec</span>(<span class="st">"mrss.cra3"</span>, <span class="sc">!!!</span>d1<span class="fl">.3</span>a<span class="sc">$</span>parms)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>K = 41 </code></pre>
+</div>
+</div>
+<p>Of course, it is also possible to directly insert the numeric values for the design parameters. However, using the variables instead is safer, more precise, and prevents typos. Note that the results can differ due to rounding.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>d1<span class="fl">.3</span>b <span class="ot">&lt;-</span> <span class="fu">mrss.cra3</span>(<span class="at">n =</span> <span class="dv">20</span>, <span class="at">J =</span> <span class="dv">3</span>, <span class="at">es =</span> .<span class="dv">13</span>, <span class="at">rho2 =</span> .<span class="dv">04</span>, <span class="at">rho3 =</span> .<span class="dv">31</span>, <span class="at">g3 =</span> <span class="dv">5</span>, <span class="at">r21 =</span> .<span class="dv">22</span>, <span class="at">r22 =</span> .<span class="dv">74</span>, <span class="at">r23 =</span> .<span class="dv">97</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>K = 42 </code></pre>
+</div>
+</div>
+</section>
+<section id="incorporating-statistical-uncertainty" class="level5">
+<h5 class="anchored" data-anchor-id="incorporating-statistical-uncertainty">Incorporating (Statistical) Uncertainty</h5>
+<p>The design parameters are estimates of population quantities, and thus, associated with statistical uncertainty. The uncertainty can be incorporated by using the standard errors for each design parameter. Assuming large-sample properties, research Team 1 uses the standard normal distribution to compute the limits for 95% confidence intervals by means of the standard errors for the design parameters. This approach has been labeled the the “safeguard” approach <span class="citation" data-cites="perugini2014">(<a href="#ref-perugini2014" role="doc-biblioref">Perugini et al., 2014</a>)</span>. A conservative approach for planning the sample size is to use the upper bound estimate of the 95% CI for values of ρ and lower bound estimates of the 95% CI for values of <em>R</em><sup>2</sup>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>d1<span class="fl">.4</span> <span class="ot">&lt;-</span> <span class="fu">mrss.cra3</span>(<span class="at">n =</span> <span class="dv">20</span>, <span class="at">J =</span> <span class="dv">3</span>,</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">es =</span> .<span class="dv">13</span>,</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                <span class="co"># upper bound estimates of the 95% CI</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">rho2 =</span> dp_s1<span class="sc">$</span>icc_l2.est<span class="fl">+1.96</span><span class="sc">*</span>dp_s1<span class="sc">$</span>icc_l2.se, </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">rho3 =</span> dp_s1<span class="sc">$</span>icc_l3.est<span class="fl">+1.96</span><span class="sc">*</span>dp_s1<span class="sc">$</span>icc_l3.se, </span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">g3 =</span> <span class="dv">5</span>, </span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>                <span class="co"># lower bound estimates of the 95% CI</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">r21 =</span> dp_s1<span class="sc">$</span>r2_l1_pretest.est<span class="fl">-1.96</span><span class="sc">*</span>dp_s1<span class="sc">$</span>r2_l1_pretest.se, </span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">r22 =</span> dp_s1<span class="sc">$</span>r2_l2_pretest.est<span class="fl">-1.96</span><span class="sc">*</span>dp_s1<span class="sc">$</span>r2_l2_pretest.se,  </span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>                <span class="at">r23 =</span> dp_s1<span class="sc">$</span>r2_l3_pretest.est<span class="fl">-1.96</span><span class="sc">*</span>dp_s1<span class="sc">$</span>r2_l3_pretest.se)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>K = 97 </code></pre>
+</div>
+</div>
+<p>Note that there are also other approaches to tackle uncertainties and/or heterogeneities in the input parameters. For instance, (Bayesian) simulation-based approaches to power analysis have been proposed that implicitly take into account uncertainty <span class="citation" data-cites="moerbeek2015 pek2019 spiegelhalter2003 turner2004">(see e.g., <a href="#ref-moerbeek2015" role="doc-biblioref">Moerbeek &amp; Teerenstra, 2015</a>; <a href="#ref-pek2019" role="doc-biblioref">Pek &amp; Park, 2019</a>; <a href="#ref-spiegelhalter2003" role="doc-biblioref">Spiegelhalter et al., 2003</a>; <a href="#ref-turner2004" role="doc-biblioref">Turner et al., 2004</a>)</span>. For an illustration of precision simulations based on a hybrid Bayesian-classical approach <span class="citation" data-cites="spiegelhalter2003">(<a href="#ref-spiegelhalter2003" role="doc-biblioref">Spiegelhalter et al., 2003</a>)</span> to power analysis, see <span class="citation" data-cites="stallasch2023">Stallasch et al. (<a href="#ref-stallasch2023" role="doc-biblioref">2023</a>)</span>.</p>
+</section>
+<section id="vectorization" class="level5">
+<h5 class="anchored" data-anchor-id="vectorization">Vectorization</h5>
+<p>Most often researchers would like to calculate power analysis outputs over a range of input values, instead of only for a single point estimate. For instance, the research team wonders whether sampling more students per classroom would raise power and precision.</p>
+<p>We <strong>could</strong> do something like this…</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># adjust the `n` argument to 21/22/23/24/25/26/27/28/29/30</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>d1<span class="fl">.5</span>a <span class="ot">&lt;-</span> <span class="fu">mrss.cra3</span>(<span class="at">n =</span> <span class="dv">21</span>, <span class="at">J =</span> <span class="dv">3</span>, <span class="at">es =</span> .<span class="dv">13</span>, <span class="at">rho2 =</span> dp_s1<span class="sc">$</span>icc_l2.est, <span class="at">rho3 =</span> dp_s1<span class="sc">$</span>icc_l3.est, </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">g3 =</span> <span class="dv">5</span>, <span class="at">r21 =</span> dp_s1<span class="sc">$</span>r2_l1_pretest.est, <span class="at">r22 =</span> dp_s1<span class="sc">$</span>r2_l2_pretest.est, <span class="at">r23 =</span> dp_s1<span class="sc">$</span>r2_l3_pretest.est)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>d1<span class="fl">.5</span>b <span class="ot">&lt;-</span> <span class="fu">mrss.cra3</span>(<span class="at">n =</span> <span class="dv">22</span>, <span class="at">J =</span> <span class="dv">3</span>, <span class="at">es =</span> .<span class="dv">13</span>, <span class="at">rho2 =</span> dp_s1<span class="sc">$</span>icc_l2.est, <span class="at">rho3 =</span> dp_s1<span class="sc">$</span>icc_l3.est, </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">g3 =</span> <span class="dv">5</span>, <span class="at">r21 =</span> dp_s1<span class="sc">$</span>r2_l1_pretest.est, <span class="at">r22 =</span> dp_s1<span class="sc">$</span>r2_l2_pretest.est, <span class="at">r23 =</span> dp_s1<span class="sc">$</span>r2_l3_pretest.est)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>d1<span class="fl">.5</span>c <span class="ot">&lt;-</span> <span class="fu">mrss.cra3</span>(<span class="at">n =</span> <span class="dv">23</span>, <span class="at">J =</span> <span class="dv">3</span>, <span class="at">es =</span> .<span class="dv">13</span>, <span class="at">rho2 =</span> dp_s1<span class="sc">$</span>icc_l2.est, <span class="at">rho3 =</span> dp_s1<span class="sc">$</span>icc_l3.est, </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">g3 =</span> <span class="dv">5</span>, <span class="at">r21 =</span> dp_s1<span class="sc">$</span>r2_l1_pretest.est, <span class="at">r22 =</span> dp_s1<span class="sc">$</span>r2_l2_pretest.est, <span class="at">r23 =</span> dp_s1<span class="sc">$</span>r2_l3_pretest.est)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>d1<span class="fl">.5</span>d <span class="ot">&lt;-</span> <span class="fu">mrss.cra3</span>(<span class="at">n =</span> <span class="dv">24</span>, <span class="at">J =</span> <span class="dv">3</span>, <span class="at">es =</span> .<span class="dv">13</span>, <span class="at">rho2 =</span> dp_s1<span class="sc">$</span>icc_l2.est, <span class="at">rho3 =</span> dp_s1<span class="sc">$</span>icc_l3.est, </span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">g3 =</span> <span class="dv">5</span>, <span class="at">r21 =</span> dp_s1<span class="sc">$</span>r2_l1_pretest.est, <span class="at">r22 =</span> dp_s1<span class="sc">$</span>r2_l2_pretest.est, <span class="at">r23 =</span> dp_s1<span class="sc">$</span>r2_l3_pretest.est)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="co"># and so on...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>BUT WE SHOULD ABSOLUTELY NOT!!!</strong> Not only is this code pretty ugly, it is – most importantly – highly prone to typos, C&amp;P mistakes etc.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Performing power analysis over a range of possible input parameters can be much more easily done via vectorization. To vectorize the functions of PowerUpR over a range of possible input parameters (here: 21 ≤ n ≤ 30), we need to write a custom function similar to what is suggested by the package authors in their <a href="https://cran.r-project.org/web/packages/PowerUpR/vignettes/vectorization_over_arbitary_parameters.html">vignette on vectorization</a>). See also Scenario 3 for another example how to use vectorization.</p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># custom function, for instance, with the option to include a pretest</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>custom_mrss.cra3 <span class="ot">&lt;-</span> <span class="cf">function</span>(n, <span class="at">pretest=</span><span class="cn">FALSE</span>) {</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  parms <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">n=</span>n, <span class="at">J=</span><span class="dv">3</span>, <span class="at">es=</span>.<span class="dv">13</span>, </span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">rho2=</span>dp_s1<span class="sc">$</span>icc_l2.est, </span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">rho3=</span>dp_s1<span class="sc">$</span>icc_l3.est,</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">g3=</span><span class="dv">0</span>, <span class="at">r21=</span><span class="dv">0</span>, <span class="at">r22=</span><span class="dv">0</span>, <span class="at">r23=</span><span class="dv">0</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># to include a pretest</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">isTRUE</span>(pretest)) {</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    parms <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">n=</span>n, <span class="at">J=</span><span class="dv">3</span>, <span class="at">es=</span>.<span class="dv">13</span>,</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rho2=</span>dp_s1<span class="sc">$</span>icc_l2.est, </span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rho3=</span>dp_s1<span class="sc">$</span>icc_l3.est,</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>                  <span class="at">g3=</span><span class="dv">1</span>, </span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">r21=</span>dp_s1<span class="sc">$</span>r2_l1_pretest.est, </span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>                  <span class="at">r22=</span>dp_s1<span class="sc">$</span>r2_l2_pretest.est, </span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>                  <span class="at">r23=</span>dp_s1<span class="sc">$</span>r2_l3_pretest.est)</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>  design <span class="ot">&lt;-</span> <span class="fu">exec</span>(<span class="st">"mrss.cra3"</span>, <span class="sc">!!!</span>parms)</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>  design<span class="sc">$</span>K</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we simply have to map the function across the various sample sizes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># number of students per school 21 ≤ n ≤ 30 </span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">21</span>, <span class="dv">30</span>, <span class="dv">1</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># without a pretest</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>d1<span class="fl">.5</span> <span class="ot">&lt;-</span> <span class="fu">map_dbl</span>(n, custom_mrss.cra3) <span class="sc">|&gt;</span> <span class="fu">set_names</span>(n)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>K = 620 
+K = 619 
+K = 618 
+K = 617 
+K = 617 
+K = 616 
+K = 615 
+K = 615 
+K = 614 
+K = 614 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># with a pretest</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>d1<span class="fl">.6</span> <span class="ot">&lt;-</span> <span class="fu">map_dbl</span>(n, <span class="sc">~</span><span class="fu">custom_mrss.cra3</span>(<span class="at">n =</span> ., <span class="at">pretest=</span><span class="cn">TRUE</span>)) <span class="sc">|&gt;</span>  <span class="fu">set_names</span>(n)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>K = 62 
+K = 62 
+K = 61 
+K = 60 
+K = 60 
+K = 59 
+K = 59 
+K = 58 
+K = 58 
+K = 58 </code></pre>
+</div>
+</div>
+<p>Sampling more students per school can reduce the required number of schools. However, it becomes clear that increasing the number of students per school is by far not as effective than increasing the number of schools and quickly reaches a point of diminishing returns.</p>
+</section>
+</section>
+<section id="plotting" class="level4">
+<h4 class="anchored" data-anchor-id="plotting">Plotting</h4>
+<p>Let’s plot the results. Move your cursor across the bars to learn about the required number schools for each design and how large the difference in % is compared to the baseline design.</p>
+<details>
+<summary>
+show code
+</summary>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>packages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"plotly"</span>, <span class="st">"htmlwidgets"</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">invisible</span>(</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(packages,</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>         <span class="cf">function</span>(x) {</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>           <span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(x, <span class="at">character.only =</span> <span class="cn">TRUE</span>)) {</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>             <span class="fu">install.packages</span>(x, <span class="at">dependencies =</span> <span class="cn">TRUE</span>); <span class="fu">require</span>(x, <span class="at">character.only =</span> <span class="cn">TRUE</span>)}</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>         }</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>design <span class="ot">&lt;-</span> <span class="fu">list</span>(d1<span class="fl">.0</span>, d1<span class="fl">.1</span>, d1<span class="fl">.2</span>, d1<span class="fl">.3</span>, d1<span class="fl">.4</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_names</span>(<span class="st">"d1.0 Basline"</span>, </span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">"d1.1 Pretest"</span>, </span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>            <span class="st">"d1.2 Sociodemographics"</span>, </span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>            <span class="st">"d1.3 Combi"</span>, </span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>            <span class="st">"d1.4 Pretest conservative"</span>)</span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>delta <span class="ot">&lt;-</span> <span class="cf">function</span>(design) (design[[<span class="st">"K"</span>]]<span class="sc">-</span>d1<span class="fl">.0</span>[[<span class="st">"K"</span>]])<span class="sc">/</span>d1<span class="fl">.0</span>[[<span class="st">"K"</span>]]<span class="sc">*</span><span class="dv">100</span></span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">design =</span> <span class="fu">factor</span>(<span class="fu">names</span>(design)), </span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>                <span class="at">schools =</span> <span class="fu">map_dbl</span>(design, <span class="sc">~</span>.[[<span class="st">"K"</span>]]), </span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>                <span class="at">delta =</span> <span class="fu">map_dbl</span>(design, delta)) <span class="sc">|&gt;</span> </span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(design, schools, <span class="at">text =</span> <span class="fu">paste</span>(</span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">factor</span>(design, </span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>           <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"d1.0 Basline"</span>, </span>
+<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"d1.1 Pretest"</span>, </span>
+<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"d1.2 Sociodemographics"</span>, </span>
+<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"d1.3 Combi"</span>, </span>
+<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"d1.4 Pretest conservative"</span>), </span>
+<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a>           <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"The baseline design"</span>, </span>
+<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"... statistically controlling for a pretest"</span>, </span>
+<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"... statistically controlling for sociodemographics"</span>, </span>
+<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"... statistically controlling for the full covariate battery"</span>, </span>
+<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"... applying a conservative approach with pretests"</span>)),</span>
+<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a>    <span class="st">" requires K = "</span>, schools, <span class="st">" schools."</span>,<span class="st">"</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="cb25-39"><a href="#cb25-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ifelse</span>(design<span class="sc">==</span><span class="st">"d1.0 Basline"</span>, <span class="st">""</span>, </span>
+<span id="cb25-40"><a href="#cb25-40" aria-hidden="true" tabindex="-1"></a>           <span class="fu">ifelse</span>(design<span class="sc">!=</span><span class="st">"d1.0 Basline"</span> <span class="sc">&amp;</span> delta <span class="sc">&gt;</span> <span class="dv">0</span>, </span>
+<span id="cb25-41"><a href="#cb25-41" aria-hidden="true" tabindex="-1"></a>           <span class="fu">paste0</span>(<span class="st">"This amounts to "</span>, <span class="fu">round</span>(delta, <span class="dv">0</span>), </span>
+<span id="cb25-42"><a href="#cb25-42" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"% more schools compared to the baseline design."</span>),</span>
+<span id="cb25-43"><a href="#cb25-43" aria-hidden="true" tabindex="-1"></a>           <span class="fu">ifelse</span>(design<span class="sc">!=</span><span class="st">"d1.0 Basline"</span> <span class="sc">&amp;</span> delta <span class="sc">==</span> <span class="dv">0</span>, </span>
+<span id="cb25-44"><a href="#cb25-44" aria-hidden="true" tabindex="-1"></a>           <span class="st">"The required number of schools does not change compared to the baseline design."</span>,</span>
+<span id="cb25-45"><a href="#cb25-45" aria-hidden="true" tabindex="-1"></a>           <span class="fu">paste0</span>(<span class="st">"This amounts to "</span>, <span class="fu">round</span>(delta, <span class="dv">0</span>)<span class="sc">*-</span><span class="dv">1</span>, </span>
+<span id="cb25-46"><a href="#cb25-46" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"% fewer schools compared to the baseline design."</span>)))),</span>
+<span id="cb25-47"><a href="#cb25-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">sep =</span> <span class="st">""</span></span>
+<span id="cb25-48"><a href="#cb25-48" aria-hidden="true" tabindex="-1"></a>    ))) <span class="sc">+</span></span>
+<span id="cb25-49"><a href="#cb25-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span><span class="st">"identity"</span>, <span class="at">width=</span><span class="fl">0.9</span>) <span class="sc">+</span> </span>
+<span id="cb25-50"><a href="#cb25-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="st">"Design"</span>) <span class="sc">+</span> </span>
+<span id="cb25-51"><a href="#cb25-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="st">"Number of schools"</span>) <span class="sc">+</span> </span>
+<span id="cb25-52"><a href="#cb25-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb25-53"><a href="#cb25-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.ticks =</span> <span class="fu">element_blank</span>(), </span>
+<span id="cb25-54"><a href="#cb25-54" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>)) <span class="sc">+</span> </span>
+<span id="cb25-55"><a href="#cb25-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Number of Schools Required for an MDES of .13 by Design"</span>)</span>
+<span id="cb25-56"><a href="#cb25-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-57"><a href="#cb25-57" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(p, <span class="at">tooltip =</span> <span class="st">"text"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</details>
+<div class="cell">
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-bb3b1b133743d11a0b7e" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-bb3b1b133743d11a0b7e">{"x":{"data":[{"orientation":"v","width":[0.89999999999999991,0.90000000000000013,0.90000000000000036,0.90000000000000036,0.90000000000000036],"base":[0,0,0,0,0],"x":[1,2,3,4,5],"y":[621,63,123,41,97],"text":["The baseline design requires K = 621 schools.<br />","... statistically controlling for a pretest requires K = 63 schools.<br />This amounts to 90% fewer schools compared to the baseline design.","... statistically controlling for sociodemographics requires K = 123 schools.<br />This amounts to 80% fewer schools compared to the baseline design.","... statistically controlling for the full covariate battery requires K = 41 schools.<br />This amounts to 93% fewer schools compared to the baseline design.","... applying a conservative approach with pretests requires K = 97 schools.<br />This amounts to 84% fewer schools compared to the baseline design."],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(89,89,89,1)","line":{"width":1.8897637795275593,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":43.762557077625573,"r":7.3059360730593621,"b":40.182648401826491,"l":43.105022831050235},"font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"Number of Schools Required for an MDES of .13 by Design","font":{"color":"rgba(0,0,0,1)","family":"","size":17.534246575342465},"x":0.5,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,5.5999999999999996],"tickmode":"array","ticktext":["d1.0 Basline","d1.1 Pretest","d1.2 Sociodemographics","d1.3 Combi","d1.4 Pretest conservative"],"tickvals":[1,2,3,4,5],"categoryorder":"array","categoryarray":["d1.0 Basline","d1.1 Pretest","d1.2 Sociodemographics","d1.3 Combi","d1.4 Pretest conservative"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"Design","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-31.050000000000001,652.04999999999995],"tickmode":"array","ticktext":["0","200","400","600"],"tickvals":[0,200,400,600],"categoryorder":"array","categoryarray":["0","200","400","600"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"Number of schools","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"64f43f80ad3":{"x":{},"y":{},"text":{},"type":"bar"}},"cur_data":"64f43f80ad3","visdat":{"64f43f80ad3":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="your-turn" class="level2">
+<h2 class="anchored" data-anchor-id="your-turn">Your turn!</h2>
+<section id="scenario-2-finding-the-minimum-required-sample-size-for-a-2l-crt" class="level3">
+<h3 class="anchored" data-anchor-id="scenario-2-finding-the-minimum-required-sample-size-for-a-2l-crt">Scenario 2: Finding the Minimum Required Sample Size for a 2L-CRT</h3>
+<p>Research Team 2 would like to conduct a 2L-CRT on the effectiveness of a curricular-based school reform targeted at improving 4th graders’ mathematics achievement in Germany. Team 2 plans to sample 40 students from each school. To improve statistical power and precision, the researchers administer a math pretest to each participating student.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Exercises</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">R Code Solutions</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<ol type="1">
+<li><p>With the aid of the flow chart, choose the appropriate design parameters from the <code>multides1</code> database.</p></li>
+<li><p>Use the <code>mrss.cra2()</code> function to compute how many schools are necessary to detect a standardized treatment effect of <em>d</em> = .15 with confidence (i.e., α = .05, two-tailed, 1-β = .80).</p></li>
+<li><p>All else held constant, what happens when…</p></li>
+</ol>
+<ul>
+<li><ol type="a">
+<li>increasing power from 80% to 90%?</li>
+</ol></li>
+<li><ol start="2" type="a">
+<li>adding sociodemographics as covariates (over and above the included math pretest) at the school level only, and both at the school and student level?</li>
+</ol></li>
+<li><ol start="3" type="a">
+<li>no covariates are used?</li>
+</ol></li>
+<li><ol start="4" type="a">
+<li>larger between-school achievement differences of ρ<sub>L3</sub> = .20 are assumed?</li>
+</ol></li>
+<li><ol start="5" type="a">
+<li>taking statistical uncertainty into account to opt for a conservative or a liberal approach?</li>
+</ol></li>
+</ul>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<ol type="1">
+<li>With the aid of the flow chart, choose the appropriate design parameters from the <code>multides1</code> database.</li>
+</ol>
+<p><img src="img/s2_2lcrt.png" class="img-fluid"></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># -- choose data frame B9 </span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>dp_s2 <span class="ot">&lt;-</span> multides1[[<span class="st">"B9_General-2l"</span>]] <span class="sc">|&gt;</span> </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># filter mathematics in grade 4</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(domain <span class="sc">==</span> <span class="st">"Mathematics"</span>, grade <span class="sc">==</span> <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ol start="2" type="1">
+<li>Use the <code>mrss.cra2()</code> function to compute how many schools are necessary to detect a standardized treatment effect of <em>d</em> = .15 with confidence (i.e., α = .05, two-tailed, 1-β = .80).</li>
+</ol>
+<section id="baseline-design-with-a-math-pretest-as-covariate" class="level5">
+<h5 class="anchored" data-anchor-id="baseline-design-with-a-math-pretest-as-covariate">Baseline design with a math pretest as covariate</h5>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mrss.cra2</span>(<span class="at">es =</span> .<span class="dv">15</span>, <span class="at">n =</span> <span class="dv">40</span>, <span class="at">rho2 =</span> dp_s2<span class="sc">$</span>icc_l3.est, </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">g2 =</span> <span class="dv">1</span>, <span class="at">r21 =</span> dp_s2<span class="sc">$</span>r2_l1_pretest.est, <span class="at">r22 =</span> dp_s2<span class="sc">$</span>r2_l3_pretest.est)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>J = 80 </code></pre>
+</div>
+</div>
+<ol start="3" type="1">
+<li>All else held constant, what happens when…</li>
+</ol>
+</section>
+<section id="a-increasing-power-from-80-to-90" class="level5">
+<h5 class="anchored" data-anchor-id="a-increasing-power-from-80-to-90">(a) increasing power from 80% to 90%?</h5>
+<p>Adjust the <code>power</code> argument to .90.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mrss.cra2</span>(<span class="at">power =</span> .<span class="dv">90</span>, <span class="at">es =</span> .<span class="dv">15</span>, <span class="at">n =</span> <span class="dv">40</span>, <span class="at">rho2 =</span> dp_s2<span class="sc">$</span>icc_l3.est, </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">g2 =</span> <span class="dv">1</span>, <span class="at">r21 =</span> dp_s2<span class="sc">$</span>r2_l1_pretest.est, <span class="at">r22 =</span> dp_s2<span class="sc">$</span>r2_l3_pretest.est)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>J = 107 </code></pre>
+</div>
+</div>
+<p>Or, update the respective parameter in the list <code>$parms</code> stored in the <code>mrss</code> object and then call the function again with the modified argument.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># save the baseline design as a new design</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (if not saved into an object before, specify the design again)</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>d2<span class="fl">.0</span> <span class="ot">&lt;-</span> <span class="fu">mrss.cra2</span>(<span class="at">es =</span> .<span class="dv">15</span>, <span class="at">n =</span> <span class="dv">40</span>, <span class="at">rho2 =</span> dp_s2<span class="sc">$</span>icc_l3.est, </span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">g2 =</span> <span class="dv">1</span>, <span class="at">r21 =</span> dp_s2<span class="sc">$</span>r2_l1_pretest.est, <span class="at">r22 =</span> dp_s2<span class="sc">$</span>r2_l3_pretest.est)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>J = 80 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>d2.a <span class="ot">&lt;-</span> d2<span class="fl">.0</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co"># update power argument to .90</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>d2.a<span class="sc">$</span>parms<span class="sc">$</span>power <span class="ot">=</span> .<span class="dv">90</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="co"># call the function</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>d2.a <span class="ot">&lt;-</span> <span class="fu">exec</span>(<span class="st">"mrss.cra2"</span>, <span class="sc">!!!</span>d2.a<span class="sc">$</span>parms)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>J = 107 </code></pre>
+</div>
+</div>
+</section>
+<section id="b-adding-sociodemographics-as-covariates-over-and-above-the-included-math-pretest-at-the-school-level-only-and-both-at-the-school-and-student-level" class="level5">
+<h5 class="anchored" data-anchor-id="b-adding-sociodemographics-as-covariates-over-and-above-the-included-math-pretest-at-the-school-level-only-and-both-at-the-school-and-student-level">(b) adding sociodemographics as covariates (over and above the included math pretest) at the school level only, and both at the school and student level?</h5>
+<p>Let’s have a look at the relevant design parameters first.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>dp_s2  <span class="sc">|&gt;</span>  </span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># select R-squared values for the combination of pretest and sociodemographics</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">contains</span>(<span class="st">"pretestses"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">round</span>(<span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(), <span class="at">names_to =</span> <span class="st">"Variable"</span>, <span class="at">values_to =</span> <span class="st">"Value"</span>) <span class="sc">|&gt;</span>  </span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kbl</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Variable</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">r2_l1_pretestses.est</td>
+<td style="text-align: right;">0.43</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">r2_l1_pretestses.se</td>
+<td style="text-align: right;">0.01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">r2_l3_pretestses.est</td>
+<td style="text-align: right;">0.76</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">r2_l3_pretestses.se</td>
+<td style="text-align: right;">0.03</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<p>Add 4 sociodemographics at L2 only – adjust only <code>r22</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mrss.cra2</span>(<span class="at">es =</span> .<span class="dv">15</span>, <span class="at">n =</span> <span class="dv">40</span>, <span class="at">rho2 =</span> dp_s2<span class="sc">$</span>icc_l3.est,</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">g2 =</span> <span class="dv">4</span>, <span class="at">r21 =</span> dp_s2<span class="sc">$</span>r2_l3_pretest.est, <span class="at">r22 =</span> dp_s2<span class="sc">$</span>r2_l1_pretestses.est)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>J = 109 </code></pre>
+</div>
+</div>
+<p>Add 4 sociodemographics at both L1 and L2 – adjust both <code>r21</code> and <code>r22</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mrss.cra2</span>(<span class="at">es =</span> .<span class="dv">15</span>, <span class="at">n =</span> <span class="dv">40</span>, <span class="at">rho2 =</span> dp_s2<span class="sc">$</span>icc_l3.est,</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">g2 =</span> <span class="dv">4</span>, <span class="at">r21 =</span> dp_s2<span class="sc">$</span>r2_l3_pretestses.est, <span class="at">r22 =</span> dp_s2<span class="sc">$</span>r2_l1_pretestses.est)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>J = 105 </code></pre>
+</div>
+</div>
+</section>
+<section id="c-no-covariates-are-used" class="level5">
+<h5 class="anchored" data-anchor-id="c-no-covariates-are-used">(c) no covariates are used?</h5>
+<p>Set all covariate-specific arguments to zero. Note that this can be achieved by <strong>not</strong> specifying the covariate-specific arguments (defaults: <code>g2=0</code>, <code>r21=0</code>, <code>r22=0</code>).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mrss.cra2</span>(<span class="at">es =</span> .<span class="dv">15</span>, <span class="at">n =</span> <span class="dv">40</span>, <span class="at">rho2 =</span> dp_s2<span class="sc">$</span>icc_l3.est)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>J = 199 </code></pre>
+</div>
+</div>
+</section>
+<section id="e-larger-between-school-achievement-differences-of-ρl3-.20-are-assumed" class="level5">
+<h5 class="anchored" data-anchor-id="e-larger-between-school-achievement-differences-of-ρl3-.20-are-assumed">(e) larger between-school achievement differences of ρ<sub>L3</sub> = .20 are assumed?</h5>
+<p>Set <code>rho2</code> (denoting our ρ<sub>L3</sub> in the PowerUpR naming convention for two-level designs) to .20</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mrss.cra2</span>(<span class="at">es =</span> .<span class="dv">15</span>, <span class="at">n =</span> <span class="dv">40</span>, <span class="at">rho2 =</span> .<span class="dv">20</span>, </span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">g2 =</span> <span class="dv">1</span>, <span class="at">r21 =</span> dp_s2<span class="sc">$</span>r2_l1_pretest.est, <span class="at">r22 =</span> dp_s2<span class="sc">$</span>r2_l3_pretest.est)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>J = 119 </code></pre>
+</div>
+</div>
+</section>
+<section id="f-taking-statistical-uncertainty-into-account-to-opt-for-a-conservative-or-a-liberal-approach" class="level5">
+<h5 class="anchored" data-anchor-id="f-taking-statistical-uncertainty-into-account-to-opt-for-a-conservative-or-a-liberal-approach">(f) taking statistical uncertainty into account to opt for a conservative or a liberal approach?</h5>
+<p>Use the standard normal distribution to compute the limits for 95% confidence intervals by means of the standard errors of the design parameters.<br>
+</p>
+<p>A conservative approach could be to rely on the upper bound estimate of the 95% CI for ρ, and the lower bound estimates for the <em>R</em><sup>2</sup> values.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mrss.cra2</span>(<span class="at">es =</span> .<span class="dv">15</span>, <span class="at">n =</span> <span class="dv">40</span>,</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">rho2 =</span> dp_s2<span class="sc">$</span>icc_l3.est<span class="fl">+1.96</span><span class="sc">*</span>dp_s2<span class="sc">$</span>icc_l3.se,</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">g2 =</span> <span class="dv">1</span>,</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">r21 =</span> dp_s2<span class="sc">$</span>r2_l1_pretest.est<span class="fl">-1.96</span><span class="sc">*</span>dp_s2<span class="sc">$</span>r2_l1_pretest.se,</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">r22 =</span> dp_s2<span class="sc">$</span>r2_l3_pretest.est<span class="fl">-1.96</span><span class="sc">*</span>dp_s2<span class="sc">$</span>r2_l3_pretest.se)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>J = 106 </code></pre>
+</div>
+</div>
+<p>A liberal approach could be to rely on the lower bound estimate of the 95% CI for ρ, and the upper bound estimates for the <em>R</em><sup>2</sup> values.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mrss.cra2</span>(<span class="at">es =</span> .<span class="dv">15</span>, <span class="at">n =</span> <span class="dv">40</span>,</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">rho2 =</span> dp_s2<span class="sc">$</span>icc_l3.est<span class="fl">-1.96</span><span class="sc">*</span>dp_s2<span class="sc">$</span>icc_l3.se,</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">g2 =</span> <span class="dv">1</span>,</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">r21 =</span> dp_s2<span class="sc">$</span>r2_l1_pretest.est<span class="fl">+1.96</span><span class="sc">*</span>dp_s2<span class="sc">$</span>r2_l1_pretest.se,</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">r22 =</span> dp_s2<span class="sc">$</span>r2_l3_pretest.est<span class="fl">+1.96</span><span class="sc">*</span>dp_s2<span class="sc">$</span>r2_l3_pretest.se)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>J = 59 </code></pre>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+</section>
+<section id="scenario-3-computing-the-minimum-detectable-effect-size-for-a-3l-crt" class="level3">
+<h3 class="anchored" data-anchor-id="scenario-3-computing-the-minimum-detectable-effect-size-for-a-3l-crt">Scenario 3: Computing the Minimum Detectable Effect Size for a 3L-CRT</h3>
+<p>Research Team 3 plans a 3L-CRT to study the impact of an intervention that is intended to affect students’ history achievement across Grades 5 to 12 in (non-academic track) comprehensive secondary schools. Due to budgetary constraints, a fixed maximum number of 40 schools (with 2 classrooms, and 20 students each) are at the researchers’ disposal. Given these limits, the primary concern of Team 3 is to ensure that the attainable <em>MDES</em> lies within the range of the effects on students’ achievement that is typically observed for this kind of intervention (i.e., 0.20 ≤ d ≤ 0.30, see <span class="citation" data-cites="hill2008">Hill et al. (<a href="#ref-hill2008" role="doc-biblioref">2008</a>)</span>). Team 3 considers two designs: (1) a design without covariates, and (2) a design that adjusts for a pretest and 4 sociodemographics (i.e., students’ gender and migration background, parents’ educational attainment, and families’ HISEI).</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In this Scenario, you should use the normative distributions of the design parameters. Recall, these data frames are indexed by the suffix “_ND”.</p>
+</div>
+</div>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Exercises</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">R Code Solutions</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<ol type="1">
+<li><p>With the aid of the flow chart, choose the appropriate design parameters from the <code>multides1</code> database.</p></li>
+<li><p>For small (25th percentile), medium (50th percentile), and large values (75th percentile) of ρ, use the <code>mdes.cra3()</code> function to compute the <em>MDES</em> which can be detected with confidence (i.e., α = .05 in a two-tailed test, 1-β = .80), given…</p></li>
+</ol>
+<ul>
+<li><ol type="a">
+<li>a design without covariates.</li>
+</ol></li>
+<li><ol start="2" type="a">
+<li>a design with adjustment for the full battery of covariates (i.e., 1 pretest plus 4 sociodemographics), using large values (75th percentile) of <em>R</em><sup>2</sup>.</li>
+</ol></li>
+</ul>
+<ol start="3" type="1">
+<li><p>Try to visualize the results.</p></li>
+<li><p><em>Additional task</em>: Suppose that research Team 3 further wishes to analyze the intervention’s effects in the academic track and on other (possibly domain-general) skills. Choose two or three other target domains for which <span class="citation" data-cites="stallasch2021">Stallasch et al. (<a href="#ref-stallasch2021" role="doc-biblioref">2021</a>)</span> provide design parameters for the academic track and perform power analyses to find the design that is most parsimonious in terms of sample size and possibly included covariates.</p></li>
+</ol>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<ol type="1">
+<li>With the aid of the flow chart, choose the appropriate design parameters from the <code>multides1</code> database.</li>
+</ol>
+<p><img src="img/s3_3lcrt.png" class="img-fluid"> Choose data frame B4.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>dp_s3 <span class="ot">&lt;-</span> multides1[[<span class="st">"B4_Adjusted_ND"</span>]] <span class="sc">|&gt;</span>  </span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># filter P25, median, and P75 for design parameters that are summarized across domains and secondary school grades</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(domain <span class="sc">==</span> <span class="st">"All"</span>, grade_range <span class="sc">==</span> <span class="st">"5-12"</span>, <span class="sc">!</span><span class="fu">grepl</span>(<span class="st">"Min|Max"</span>, statistic)) <span class="sc">|&gt;</span>  </span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># select relevant design parameters</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(statistic, <span class="fu">contains</span>(<span class="fu">c</span>(<span class="st">"icc"</span>, <span class="st">"pretestses"</span>))) <span class="sc">|&gt;</span>  </span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># simplify variable names</span></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_names</span>(<span class="fu">c</span>(<span class="st">"statistic"</span>, <span class="st">"rho2"</span>, <span class="st">"rho3"</span>, <span class="st">"r21"</span>, <span class="st">"r22"</span>, <span class="st">"r23"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ol start="2" type="1">
+<li>For small (25th percentile), medium (50th percentile), and large values (75th percentile) of the design parameters, use the <code>mdes.cra3()</code> function to compute the <em>MDES</em> which can be detected with confidence (i.e., α = .05 in a two-tailed test, 1-β = .80), given…</li>
+</ol>
+<section id="a-a-design-without-covariates." class="level5">
+<h5 class="anchored" data-anchor-id="a-a-design-without-covariates.">(a) a design without covariates.</h5>
+<p>Again, we can write a custom function to vectorize over a range of possible parameters (here: small, medium, and large ρ values).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>custom_mdes.cra3 <span class="ot">&lt;-</span> <span class="cf">function</span>(rho2, rho3, <span class="at">g3 =</span> <span class="dv">0</span>, <span class="at">r21 =</span> <span class="dv">0</span>, <span class="at">r22 =</span> <span class="dv">0</span>, <span class="at">r23 =</span> <span class="dv">0</span>, ...) {</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>  parms <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">rho2 =</span> rho2, <span class="at">rho3 =</span> rho3,</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">g3 =</span> g3, </span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">r21 =</span> r21, <span class="at">r22 =</span> r22, <span class="at">r23 =</span> r23, </span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">n =</span> <span class="dv">20</span>, <span class="at">J =</span> <span class="dv">2</span>, <span class="at">K =</span> <span class="dv">40</span>)</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>  design <span class="ot">&lt;-</span> <span class="fu">exec</span>(<span class="st">"mdes.cra3"</span>, <span class="sc">!!!</span>parms)</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>  mdes <span class="ot">&lt;-</span> design<span class="sc">$</span>mdes[<span class="dv">1</span>]  <span class="co"># MDES point estimate</span></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>  ci.lb <span class="ot">&lt;-</span> design<span class="sc">$</span>mdes[<span class="dv">2</span>] <span class="co"># lower bound of 95% CI</span></span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>  ci.ub <span class="ot">&lt;-</span> design<span class="sc">$</span>mdes[<span class="dv">3</span>] <span class="co"># upper bound of 95% CI</span></span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">data.frame</span>(<span class="at">mdes =</span> mdes, <span class="at">ci.lb =</span> ci.lb, <span class="at">ci.ub =</span> ci.ub))</span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Apply the function to compute the MDES for small, medium, and large intraclass correlations using <code>pmap()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>d3.a <span class="ot">&lt;-</span> <span class="fu">pmap</span>(dp_s3 <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">contains</span>(<span class="st">"rho"</span>)), custom_mdes.cra3) <span class="sc">%&gt;%</span> </span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_names</span>(dp_s3<span class="sc">$</span>statistic) <span class="sc">%&gt;%</span> </span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(<span class="at">.id =</span> <span class="st">"statistic"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Minimum detectable effect size: 
+--------------------------------------- 
+ 0.315 95% CI [0.093,0.536]
+---------------------------------------
+Degrees of freedom: 38
+Standardized standard error: 0.109
+Type I error rate: 0.05
+Type II error rate: 0.2
+Two-tailed test: TRUE
+
+Minimum detectable effect size: 
+--------------------------------------- 
+ 0.347 95% CI [0.103,0.592]
+---------------------------------------
+Degrees of freedom: 38
+Standardized standard error: 0.121
+Type I error rate: 0.05
+Type II error rate: 0.2
+Two-tailed test: TRUE
+
+Minimum detectable effect size: 
+--------------------------------------- 
+ 0.388 95% CI [0.115,0.661]
+---------------------------------------
+Degrees of freedom: 38
+Standardized standard error: 0.135
+Type I error rate: 0.05
+Type II error rate: 0.2
+Two-tailed test: TRUE</code></pre>
+</div>
+</div>
+</section>
+<section id="b-a-design-with-adjustment-for-the-full-battery-of-covariates-i.e.-1-pretest-plus-4-sociodemographics-using-large-values-75th-percentile-of-r2." class="level5">
+<h5 class="anchored" data-anchor-id="b-a-design-with-adjustment-for-the-full-battery-of-covariates-i.e.-1-pretest-plus-4-sociodemographics-using-large-values-75th-percentile-of-r2.">(b) a design with adjustment for the full battery of covariates (i.e., 1 pretest plus 4 sociodemographics), using large values (75th percentile) of <em>R</em><sup>2</sup>.</h5>
+<p>When adding covariates, Team 3 uses the large values for ρ (i.e., the 75th percentile) to apply a conservative approach.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># use the 75th percentile of the ICCs and adjust for 5 covariates (1 pretest + 4 sociodemographics)</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>d3.b <span class="ot">&lt;-</span> <span class="fu">pmap</span>(dp_s3 <span class="sc">%&gt;%</span> </span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>             <span class="fu">mutate</span>(<span class="at">rho2 =</span> <span class="fu">as.numeric</span>(.[.<span class="sc">$</span>statistic <span class="sc">==</span> <span class="st">"75th Percentile"</span>, <span class="st">"rho2"</span>]), </span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">rho3 =</span> <span class="fu">as.numeric</span>(.[.<span class="sc">$</span>statistic <span class="sc">==</span> <span class="st">"75th Percentile"</span>, <span class="st">"rho3"</span>]), </span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">g3 =</span> <span class="dv">5</span>), </span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>           custom_mdes.cra3) <span class="sc">%&gt;%</span> </span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_names</span>(<span class="fu">unique</span>(dp_s3<span class="sc">$</span>statistic))  <span class="sc">%&gt;%</span> </span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(<span class="at">.id =</span> <span class="st">"statistic"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Minimum detectable effect size: 
+--------------------------------------- 
+ 0.202 95% CI [0.06,0.344]
+---------------------------------------
+Degrees of freedom: 33
+Standardized standard error: 0.07
+Type I error rate: 0.05
+Type II error rate: 0.2
+Two-tailed test: TRUE
+
+Minimum detectable effect size: 
+--------------------------------------- 
+ 0.176 95% CI [0.052,0.3]
+---------------------------------------
+Degrees of freedom: 33
+Standardized standard error: 0.061
+Type I error rate: 0.05
+Type II error rate: 0.2
+Two-tailed test: TRUE
+
+Minimum detectable effect size: 
+--------------------------------------- 
+ 0.142 95% CI [0.042,0.242]
+---------------------------------------
+Degrees of freedom: 33
+Standardized standard error: 0.049
+Type I error rate: 0.05
+Type II error rate: 0.2
+Two-tailed test: TRUE</code></pre>
+</div>
+</div>
+<ol start="3" type="1">
+<li>Try to visualize the results.</li>
+</ol>
+</section>
+<section id="plotting-1" class="level5">
+<h5 class="anchored" data-anchor-id="plotting-1">Plotting</h5>
+<details>
+<summary>
+show code
+</summary>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="fu">bind_rows</span>(d3.a, d3.b, <span class="at">.id =</span> <span class="st">"design"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>              <span class="fu">mutate</span>(<span class="at">statistic =</span> <span class="fu">factor</span>(statistic, </span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"25th Percentile"</span>, </span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>                                                   <span class="st">"Median"</span>, </span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>                                                   <span class="st">"75th Percentile"</span>),</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Small"</span>, <span class="st">"Medium"</span>, <span class="st">"Large"</span>)))) <span class="sc">+</span> </span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">x =</span> statistic, <span class="at">y =</span> mdes, <span class="at">ymin =</span> ci.lb, <span class="at">ymax =</span> ci.ub, <span class="at">col =</span> design), </span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>                  <span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="at">width =</span> <span class="fl">0.5</span>)) <span class="sc">+</span> </span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> .<span class="dv">3</span>, <span class="at">lty =</span> <span class="st">"dotted"</span>) <span class="sc">+</span> </span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="st">"MDES"</span>, <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="fl">0.7</span>, <span class="fl">0.1</span>))<span class="sc">+</span></span>
+<span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#2c3e50"</span>, <span class="st">"#18bc9c"</span>),</span>
+<span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"No covariates"</span>, </span>
+<span id="cb54-13"><a href="#cb54-13" aria-hidden="true" tabindex="-1"></a>                                <span class="fu">expression</span>(<span class="st">"Pretest + Sociodemographics (with large values of"</span><span class="sc">~</span>rho<span class="sc">*</span><span class="st">")"</span>))) <span class="sc">+</span> </span>
+<span id="cb54-14"><a href="#cb54-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb54-15"><a href="#cb54-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb54-16"><a href="#cb54-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.title =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb54-17"><a href="#cb54-17" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.position =</span> <span class="st">"bottom"</span>, </span>
+<span id="cb54-18"><a href="#cb54-18" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>)) <span class="sc">+</span> </span>
+<span id="cb54-19"><a href="#cb54-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"MDES (with 95% CI) for Normative Distributions of Design Parameters"</span>) <span class="sc">+</span> </span>
+<span id="cb54-20"><a href="#cb54-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"rect"</span>, <span class="at">xmin =</span> <span class="sc">-</span><span class="cn">Inf</span>, <span class="at">xmax =</span> <span class="cn">Inf</span>, <span class="at">ymin =</span> <span class="fl">0.3</span>, <span class="at">ymax =</span> <span class="cn">Inf</span>,</span>
+<span id="cb54-21"><a href="#cb54-21" aria-hidden="true" tabindex="-1"></a>           <span class="at">alpha =</span> .<span class="dv">2</span>)</span>
+<span id="cb54-22"><a href="#cb54-22" aria-hidden="true" tabindex="-1"></a>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="multilevel_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</details>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="multilevel_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>
+&nbsp;
+</p>
+<p>Team 3 learns that the attainable <em>MDES</em> is 0.31/0.35/0.39 (point estimates) for small/medium/large values of ρ<sub>L2</sub> and ρ<sub>L3</sub>. Including both a pretest and sociodemographics as covariates and using the 75th percentiles of the values for ρ<sub>L2</sub> and ρ<sub>L3</sub> (as more conservative upper bounds), the respective values for the MDES reduce to 0.2/0.18/0.14 for small/medium/large values of <em>R</em><sup>2</sup> at the various levels. Consequently, Team 3 can be quite confident that their CRT design offers sufficient sensitivity to detect a true intervention effect within the desired range when including both pretests and sociodemographics.</p>
+</section>
+</div>
+</div>
+</div>
+
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-line-spacing="2" role="list">
+<div id="ref-brunner2023" class="csl-entry" role="listitem">
+Brunner, M., Stallasch, S. E., &amp; Lüdtke, O. (2023). Empirical Benchmarks to Interpret Intervention Effects on Student Achievement in Elementary and Secondary School: Meta-Analytic Results from Germany. <em>Journal of Research on Educational Effectiveness</em>, <em>17</em>(1), 119–157. <a href="https://doi.org/10.1080/19345747.2023.2175753">https://doi.org/10.1080/19345747.2023.2175753</a>
+</div>
+<div id="ref-dong2013" class="csl-entry" role="listitem">
+Dong, N., &amp; Maynard, R. (2013). <span><em>PowerUp!</em></span>: A Tool for Calculating Minimum Detectable Effect Sizes and Minimum Required Sample Sizes for Experimental and Quasi-Experimental Design Studies. <em>Journal of Research on Educational Effectiveness</em>, <em>6</em>(1), 24–67. <a href="https://doi.org/10.1080/19345747.2012.673143">https://doi.org/10.1080/19345747.2012.673143</a>
+</div>
+<div id="ref-hill2008" class="csl-entry" role="listitem">
+Hill, C. J., Bloom, H. S., Black, A. R., &amp; Lipsey, M. W. (2008). Empirical Benchmarks for Interpreting Effect Sizes in Research. <em>Child Development Perspectives</em>, <em>2</em>(3), 172–177. <a href="https://doi.org/10.1111/j.1750-8606.2008.00061.x">https://doi.org/10.1111/j.1750-8606.2008.00061.x</a>
+</div>
+<div id="ref-moerbeek2015" class="csl-entry" role="listitem">
+Moerbeek, M., &amp; Teerenstra, S. (2015). <em>Power analysis of trials with multilevel data</em>. Chapman; Hall/CRC. <a href="https://doi.org/10.1201/b18676">https://doi.org/10.1201/b18676</a>
+</div>
+<div id="ref-pek2019" class="csl-entry" role="listitem">
+Pek, J., &amp; Park, J. (2019). Complexities in power analysis: Quantifying uncertainties with a Bayesian-classical hybrid approach. <em>Psychological Methods</em>, <em>24</em>(5), 590–605. <a href="https://doi.org/10.1037/met0000208">https://doi.org/10.1037/met0000208</a>
+</div>
+<div id="ref-perugini2014" class="csl-entry" role="listitem">
+Perugini, M., Gallucci, M., &amp; Costantini, G. (2014). Safeguard Power as a Protection Against Imprecise Power Estimates. <em>Perspectives on Psychological Science</em>, <em>9</em>(3), 319–332. <a href="https://doi.org/10.1177/1745691614528519">https://doi.org/10.1177/1745691614528519</a>
+</div>
+<div id="ref-spiegelhalter2003" class="csl-entry" role="listitem">
+Spiegelhalter, D. J., Abrams, K. R., &amp; Myles, J. P. (2003). <em>Bayesian approaches to clinical trials and health<span>-</span>care evaluation</em>. <a href="https://doi.org/10.1002/0470092602">https://doi.org/10.1002/0470092602</a>
+</div>
+<div id="ref-stallasch2021" class="csl-entry" role="listitem">
+Stallasch, S. E., Lüdtke, O., Artelt, C., &amp; Brunner, M. (2021). Multilevel Design Parameters to Plan Cluster-Randomized Intervention Studies on Student Achievement in Elementary and Secondary School. <em>Journal of Research on Educational Effectiveness</em>, <em>14</em>(1), 172–206. <a href="https://doi.org/10.1080/19345747.2020.1823539">https://doi.org/10.1080/19345747.2020.1823539</a>
+</div>
+<div id="ref-stallasch2023" class="csl-entry" role="listitem">
+Stallasch, S. E., Lüdtke, O., Artelt, C., Hedges, L. V., &amp; Brunner, M. (2023). <em>Single- and multilevel perspectives on covariate selection in randomized intervention studies on student achievement</em>. <a href="http://dx.doi.org/10.31234/osf.io/5ajmg">http://dx.doi.org/10.31234/osf.io/5ajmg</a>
+</div>
+<div id="ref-turner2004" class="csl-entry" role="listitem">
+Turner, R. M., Toby Prevost, A., &amp; Thompson, S. G. (2004). Allowing for imprecision of the intracluster correlation coefficient in the design of cluster randomized trials. <em>Statistics in Medicine</em>, <em>23</em>(8), 1195–1214. <a href="https://doi.org/10.1002/sim.1721">https://doi.org/10.1002/sim.1721</a>
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Power Analysis in R - Single-Level Designs</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.10.4/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<script src="site_libs/jquery-3.5.1/jquery.min.js"></script>
+<link href="site_libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet">
+<script src="site_libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet">
+<script src="site_libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Power Analysis in R</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html" rel="" target="">
+ <span class="menu-text">Intro</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./dp.html" rel="" target="">
+ <span class="menu-text">Design Parameters</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./single-level.html" rel="" target="" aria-current="page">
+ <span class="menu-text">Single-Level Designs</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./multilevel.html" rel="" target="">
+ <span class="menu-text">Multilevel Designs</span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools ms-auto">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#illustration-of-the-worked-example" id="toc-illustration-of-the-worked-example" class="nav-link active" data-scroll-target="#illustration-of-the-worked-example">Illustration of the Worked Example</a>
+  <ul class="collapse">
+  <li><a href="#scenario-1-determining-statistical-power" id="toc-scenario-1-determining-statistical-power" class="nav-link" data-scroll-target="#scenario-1-determining-statistical-power">Scenario 1: Determining Statistical Power</a></li>
+  </ul></li>
+  <li><a href="#your-turn" id="toc-your-turn" class="nav-link" data-scroll-target="#your-turn">Your turn!</a>
+  <ul class="collapse">
+  <li><a href="#scenario-2-finding-the-minimum-required-sample-size" id="toc-scenario-2-finding-the-minimum-required-sample-size" class="nav-link" data-scroll-target="#scenario-2-finding-the-minimum-required-sample-size">Scenario 2: Finding the Minimum Required Sample Size</a></li>
+  <li><a href="#scenario-3-computing-the-minimum-detectable-effect-size" id="toc-scenario-3-computing-the-minimum-detectable-effect-size" class="nav-link" data-scroll-target="#scenario-3-computing-the-minimum-detectable-effect-size">Scenario 3: Computing the Minimum Detectable Effect Size</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content column-page-left" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Single-Level Designs</h1>
+<p class="subtitle lead">Individually Randomized Trials (IRTs)</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<p>In an individually randomized trial (IRT), individual students are sampled independently of each other and are randomly assigned to the experimental groups, disregarding any potential classroom or school affiliation; likewise, the treatment and control protocols are delivered at a completely individual basis.</p>
+<section id="illustration-of-the-worked-example" class="level2">
+<h2 class="anchored" data-anchor-id="illustration-of-the-worked-example">Illustration of the Worked Example</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(PowerUpR)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Worked Example
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A research team has programmed a comprehensive learning app. It is meant to function as a multidisciplinary digital learning environment for students in various grade levels in the German school system. Therefore, it can be used to support teaching and learning in manifold achievement domains throughout the entire school career. The researchers aim to experimentally evaluate whether the app actually improves student achievement.</p>
+</div>
+</div>
+<p>As a first step, the researchers aim to test the general efficacy of the underlying didactic approach. To this end, they plan a small-scale pilot IRT with elementary school students.</p>
+<section id="scenario-1-determining-statistical-power" class="level3">
+<h3 class="anchored" data-anchor-id="scenario-1-determining-statistical-power">Scenario 1: Determining Statistical Power</h3>
+<p><em>How much power is achieved to detect a certain hypothesized treatment effect, given a specified number of students?</em></p>
+<p>The research team considers a standardized treatment effect of <em>d</em> = .22 as meaningful, because it represents around one quarter of the expected annual growth in students’ achievement across elementary school for the German student population <span class="citation" data-cites="brunner2023">(<a href="#ref-brunner2023" role="doc-biblioref">Brunner et al., 2023</a>, Table 1)</span>. The team wonders how much power can be achieved when sampling and randomizing <em>N</em> = 300 students in total to detect <em>MDES</em> = .22 at significance level α = .05 in a two-tailed <em>t</em>-test with power 1−β = .80. The researchers assume a balanced design, where students are allocated to the treatment group (TG) and control group (CG) in equal shares (i.e., n<sub>TG</sub> = n<sub>CG</sub>).</p>
+<section id="formula" class="level4">
+<h4 class="anchored" data-anchor-id="formula">Formula</h4>
+<p>The expressions to compute statistical power for IRTs (and also for multilevel RT designs) involve the cumulative distribution function of the noncentral <em>t</em>-distribution and are given in OSM C in <span class="citation" data-cites="stallasch2023">Stallasch et al. (<a href="#ref-stallasch2023" role="doc-biblioref">2023</a>)</span>, and also in <span class="citation" data-cites="hedges2007">Hedges &amp; Hedberg (<a href="#ref-hedges2007" role="doc-biblioref">2007</a>)</span> and <span class="citation" data-cites="liu2013">Liu (<a href="#ref-liu2013" role="doc-biblioref">2013</a>)</span>.</p>
+</section>
+<section id="power-analysis-with-powerupr" class="level4">
+<h4 class="anchored" data-anchor-id="power-analysis-with-powerupr">Power Analysis with PowerUpR</h4>
+<p>The R code looks like this:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">power.ira</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># properties of the statistical test</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">alpha=</span>.<span class="dv">05</span>, <span class="at">two.tailed=</span><span class="cn">TRUE</span>, </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># sample size and sample allocation ratio</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">n=</span><span class="dv">300</span>, <span class="at">p=</span>.<span class="dv">50</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># hypothesized effect size</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">es=</span>.<span class="dv">22</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># possibly applied covariates</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">g1=</span><span class="dv">0</span>, <span class="at">r21=</span><span class="dv">0</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>with</p>
+<table class="table">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 57%">
+<col style="width: 27%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Definition</th>
+<th>PowerUpR argument</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(M_{n-g^*-2}\)</span></td>
+<td>multiplier for a two-tailed test <span class="math inline">\(t_{\alpha/2}+t_{1-\beta}\)</span> with <span class="math inline">\(n-g^*-2\)</span> degrees of freedom</td>
+<td><code>power=.80</code>, <code>alpha=.05</code>,<code>two.tailed=TRUE</code></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(MDES\)</span></td>
+<td>minimum detectable effect size</td>
+<td><code>es=.25</code></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(n\)</span></td>
+<td>mean number of students</td>
+<td><code>n</code></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(P\)</span></td>
+<td>proportion of sample assigned to treatment <span class="math inline">\(n_{TG}/N\)</span></td>
+<td><code>p=.50</code></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(g^*\)</span></td>
+<td>number of covariates</td>
+<td><code>g1=0</code></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(R^2\)</span></td>
+<td>explained variance by covariates</td>
+<td><code>r21=0</code></td>
+</tr>
+</tbody>
+</table>
+<p>The output looks like this:<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Statistical power: 
+--------------------------------------- 
+ 0.476
+--------------------------------------- 
+Degrees of freedom: 298
+Standardized standard error: 0.115
+Type I error rate: 0.05
+Type II error rate: 0.524
+Two-tailed test: TRUE</code></pre>
+</div>
+</div>
+<p>The achieved power level is well below an acceptable threshold for this design.</p>
+<p>As we learned before, power increases with…</p>
+<ul>
+<li><p>increasing Type I error rate (or, using a one-sided instead of a two-sided test)</p></li>
+<li><p>increasing sample size</p></li>
+<li><p>increasing effect size</p></li>
+</ul>
+<p>Let’s adjust some of the arguments and see, what happens.</p>
+<p>Set the <code>alpha</code> argument to .10.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">power.ira</span>(<span class="at">alpha=</span>.<span class="dv">10</span>, <span class="at">two.tailed=</span><span class="cn">TRUE</span>, <span class="at">n=</span><span class="dv">300</span>, <span class="at">p=</span>.<span class="dv">50</span>, <span class="at">es=</span>.<span class="dv">22</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Statistical power: 
+--------------------------------------- 
+ 0.601
+--------------------------------------- 
+Degrees of freedom: 298
+Standardized standard error: 0.115
+Type I error rate: 0.1
+Type II error rate: 0.399
+Two-tailed test: TRUE</code></pre>
+</div>
+</div>
+<p>… this should result in the same power as when setting the <code>two.tailed</code> argument to <code>FALSE</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">power.ira</span>(<span class="at">alpha=</span>.<span class="dv">05</span>, <span class="at">two.tailed=</span><span class="cn">FALSE</span>, <span class="at">n=</span><span class="dv">300</span>, <span class="at">p=</span>.<span class="dv">50</span>, <span class="at">es=</span>.<span class="dv">22</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Statistical power: 
+--------------------------------------- 
+ 0.601
+--------------------------------------- 
+Degrees of freedom: 298
+Standardized standard error: 0.115
+Type I error rate: 0.05
+Type II error rate: 0.399
+Two-tailed test: FALSE</code></pre>
+</div>
+</div>
+<p>Set the <code>n</code> argument to 600.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">power.ira</span>(<span class="at">alpha=</span>.<span class="dv">05</span>, <span class="at">two.tailed=</span><span class="cn">TRUE</span>, <span class="at">n=</span><span class="dv">600</span>, <span class="at">p=</span>.<span class="dv">50</span>, <span class="at">es=</span>.<span class="dv">22</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Statistical power: 
+--------------------------------------- 
+ 0.767
+--------------------------------------- 
+Degrees of freedom: 598
+Standardized standard error: 0.082
+Type I error rate: 0.05
+Type II error rate: 0.233
+Two-tailed test: TRUE</code></pre>
+</div>
+</div>
+<p>Set the <code>es</code> argument to .30.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">power.ira</span>(<span class="at">alpha=</span>.<span class="dv">05</span>, <span class="at">two.tailed=</span><span class="cn">TRUE</span>, <span class="at">n=</span><span class="dv">300</span>, <span class="at">p=</span>.<span class="dv">50</span>, <span class="at">es=</span>.<span class="dv">30</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Statistical power: 
+--------------------------------------- 
+ 0.736
+--------------------------------------- 
+Degrees of freedom: 298
+Standardized standard error: 0.115
+Type I error rate: 0.05
+Type II error rate: 0.264
+Two-tailed test: TRUE</code></pre>
+</div>
+</div>
+</section>
+<section id="plotting" class="level4">
+<h4 class="anchored" data-anchor-id="plotting">Plotting</h4>
+<p>PowerUpR comes with built-in plotting functionality. We can create a power curve to see how many students would be necessary to achieve a certain power level.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>s1 <span class="ot">&lt;-</span> <span class="fu">power.ira</span>(<span class="at">alpha=</span>.<span class="dv">05</span>, <span class="at">two.tailed=</span><span class="cn">TRUE</span>, <span class="at">n=</span><span class="dv">500</span>, <span class="at">p=</span>.<span class="dv">50</span>, <span class="at">es=</span>.<span class="dv">22</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(s1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="single-level_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You may also use ggplot in combination with plotly and htmlwidgets to generate an interactive power curve.</p>
+</div>
+</div>
+<p>Using ggplot, the power curve looks like this:</p>
+<details>
+<summary>
+show code
+</summary>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install/load required packages</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>packages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"plotly"</span>, <span class="st">"htmlwidgets"</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">invisible</span>(</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(packages,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>         <span class="cf">function</span>(x) {</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>           <span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(x, <span class="at">character.only =</span> <span class="cn">TRUE</span>)) {</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>             <span class="fu">install.packages</span>(x, <span class="at">dependencies =</span> <span class="cn">TRUE</span>); <span class="fu">require</span>(x, <span class="at">character.only =</span> <span class="cn">TRUE</span>)}</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>         }</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co"># write custom function to vectorize power across a range of sample sizes</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>custom_power.ira <span class="ot">&lt;-</span> <span class="cf">function</span>(n) {</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  parms <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">n=</span>n, <span class="at">es=</span>.<span class="dv">22</span>)</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  design <span class="ot">&lt;-</span> <span class="fu">exec</span>(<span class="st">"power.ira"</span>, <span class="sc">!!!</span>parms)</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  design<span class="sc">$</span>power[<span class="dv">1</span>]</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="co"># number of students ranging from 10 to 1000</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">10</span>, <span class="dv">1000</span>, <span class="dv">10</span>)</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="co"># map across the sample size vector</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>pwr <span class="ot">&lt;-</span> <span class="fu">map_dbl</span>(n, custom_power.ira) <span class="sc">|&gt;</span> <span class="fu">set_names</span>(n)</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a><span class="co"># plot power curve</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">n =</span> n, <span class="at">pwr =</span> pwr) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(pwr) <span class="sc">%&gt;%</span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.numeric</span>(n), <span class="at">y =</span> value, </span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>           <span class="at">text =</span> <span class="fu">paste</span>(</span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>             <span class="st">"With "</span> , n, <span class="st">" students "</span>,</span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>             <span class="fu">round</span>(value<span class="sc">*</span><span class="dv">100</span>, <span class="dv">0</span>), <span class="st">"% Power is achieved."</span>, <span class="at">sep =</span> <span class="st">""</span>), <span class="at">group =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> .<span class="dv">8</span>, <span class="at">lty =</span> <span class="st">"dotted"</span>) <span class="sc">+</span> </span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="st">"Statistical Power"</span>, <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, .<span class="dv">2</span>)) <span class="sc">+</span> </span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="st">"Number of students"</span>, <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">1000</span>), <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">50</span>, <span class="dv">1000</span>, <span class="dv">100</span>)) <span class="sc">+</span> </span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.ticks =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">margin =</span> <span class="fu">margin</span>(<span class="fl">0.25</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>)),</span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>), </span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="dv">0</span>,<span class="fl">0.25</span>,<span class="dv">1</span>,<span class="fl">0.25</span>, <span class="at">unit =</span> <span class="st">"cm"</span>)) <span class="sc">+</span> </span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Statistical Power as a Function of the Number of Students"</span>)</span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplotly</span>(p, <span class="at">tooltip =</span> <span class="st">"text"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</details>
+<div class="cell">
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-fe2070d26c86a429d8be" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-fe2070d26c86a429d8be">{"x":{"data":[{"x":[10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300,310,320,330,340,350,360,370,380,390,400,410,420,430,440,450,460,470,480,490,500,510,520,530,540,550,560,570,580,590,600,610,620,630,640,650,660,670,680,690,700,710,720,730,740,750,760,770,780,790,800,810,820,830,840,850,860,870,880,890,900,910,920,930,940,950,960,970,980,990,1000],"y":[0.060952186193438673,0.075249803110111535,0.089628986244969178,0.10414032524916106,0.11877440174486464,0.13351254757919806,0.14833428948601246,0.16321918491286436,0.17814741049788241,0.19309997723200956,0.20805881021864647,0.22300677219475828,0.23792766121904119,0.2528061955766483,0.2676279920092991,0.28237954035563728,0.29704817624128499,0.31162205277011579,0.32609011176478209,0.34044205490858093,0.35466831501502727,0.36876002757767701,0.38270900270785357,0.39650769753570902,0.41014918913739729,0.423627148015989,0.43693581218608424,0.45006996187379822,0.46302489485396214,0.47579640243751653,0.48838074611842341,0.50077463488504281,0.51297520319975209,0.52497998964810255,0.53678691625324582,0.54839426846077433,0.55980067577304105,0.57100509304682034,0.58200678243204795,0.59280529595000386,0.60340045869969527,0.61379235268409049,0.62398130124182494,0.63396785407742373,0.64375277287482113,0.6533370174823474,0.66272173265970824,0.67190823536690114,0.68089800258966882,0.68969265968071847,0.69829396921358611,0.70670382031760448,0.71492421849979348,0.72295727592821113,0.73080520216526912,0.73847029533932751,0.74595493373630173,0.75326156780593123,0.76039271255865237,0.76735094035022855,0.77413887403345016,0.78075918046682313,0.7872145643710472,0.79350776251092836,0.7996415382048081,0.80561867613474136,0.81144197745801683,0.81711425519957281,0.82263832991918295,0.82801702564041102,0.83325316603576782,0.83834957084296124,0.84330905252288124,0.8481344131344879,0.85282844142100334,0.85739391009964772,0.86183357334507071,0.86615016445641779,0.87034639370434774,0.87442494633843848,0.8783884807674085,0.88223962687528545,0.88598098450150864,0.88961512204089011,0.89314457518847468,0.89657184580260951,0.89989940088476317,0.90312967167723401,0.90626505286130643,0.90930790185439514,0.91226053821272268,0.91512524310706067,0.91790425889635219,0.920599788774904,0.92321399649390445,0.9257490061588739,0.92820690208105017,0.93058972871113699,0.93289949060645483,0.93513815246942511],"text":["With 10 students 6% Power is achieved.","With 20 students 8% Power is achieved.","With 30 students 9% Power is achieved.","With 40 students 10% Power is achieved.","With 50 students 12% Power is achieved.","With 60 students 13% Power is achieved.","With 70 students 15% Power is achieved.","With 80 students 16% Power is achieved.","With 90 students 18% Power is achieved.","With 100 students 19% Power is achieved.","With 110 students 21% Power is achieved.","With 120 students 22% Power is achieved.","With 130 students 24% Power is achieved.","With 140 students 25% Power is achieved.","With 150 students 27% Power is achieved.","With 160 students 28% Power is achieved.","With 170 students 30% Power is achieved.","With 180 students 31% Power is achieved.","With 190 students 33% Power is achieved.","With 200 students 34% Power is achieved.","With 210 students 35% Power is achieved.","With 220 students 37% Power is achieved.","With 230 students 38% Power is achieved.","With 240 students 40% Power is achieved.","With 250 students 41% Power is achieved.","With 260 students 42% Power is achieved.","With 270 students 44% Power is achieved.","With 280 students 45% Power is achieved.","With 290 students 46% Power is achieved.","With 300 students 48% Power is achieved.","With 310 students 49% Power is achieved.","With 320 students 50% Power is achieved.","With 330 students 51% Power is achieved.","With 340 students 52% Power is achieved.","With 350 students 54% Power is achieved.","With 360 students 55% Power is achieved.","With 370 students 56% Power is achieved.","With 380 students 57% Power is achieved.","With 390 students 58% Power is achieved.","With 400 students 59% Power is achieved.","With 410 students 60% Power is achieved.","With 420 students 61% Power is achieved.","With 430 students 62% Power is achieved.","With 440 students 63% Power is achieved.","With 450 students 64% Power is achieved.","With 460 students 65% Power is achieved.","With 470 students 66% Power is achieved.","With 480 students 67% Power is achieved.","With 490 students 68% Power is achieved.","With 500 students 69% Power is achieved.","With 510 students 70% Power is achieved.","With 520 students 71% Power is achieved.","With 530 students 71% Power is achieved.","With 540 students 72% Power is achieved.","With 550 students 73% Power is achieved.","With 560 students 74% Power is achieved.","With 570 students 75% Power is achieved.","With 580 students 75% Power is achieved.","With 590 students 76% Power is achieved.","With 600 students 77% Power is achieved.","With 610 students 77% Power is achieved.","With 620 students 78% Power is achieved.","With 630 students 79% Power is achieved.","With 640 students 79% Power is achieved.","With 650 students 80% Power is achieved.","With 660 students 81% Power is achieved.","With 670 students 81% Power is achieved.","With 680 students 82% Power is achieved.","With 690 students 82% Power is achieved.","With 700 students 83% Power is achieved.","With 710 students 83% Power is achieved.","With 720 students 84% Power is achieved.","With 730 students 84% Power is achieved.","With 740 students 85% Power is achieved.","With 750 students 85% Power is achieved.","With 760 students 86% Power is achieved.","With 770 students 86% Power is achieved.","With 780 students 87% Power is achieved.","With 790 students 87% Power is achieved.","With 800 students 87% Power is achieved.","With 810 students 88% Power is achieved.","With 820 students 88% Power is achieved.","With 830 students 89% Power is achieved.","With 840 students 89% Power is achieved.","With 850 students 89% Power is achieved.","With 860 students 90% Power is achieved.","With 870 students 90% Power is achieved.","With 880 students 90% Power is achieved.","With 890 students 91% Power is achieved.","With 900 students 91% Power is achieved.","With 910 students 91% Power is achieved.","With 920 students 92% Power is achieved.","With 930 students 92% Power is achieved.","With 940 students 92% Power is achieved.","With 950 students 92% Power is achieved.","With 960 students 93% Power is achieved.","With 970 students 93% Power is achieved.","With 980 students 93% Power is achieved.","With 990 students 93% Power is achieved.","With 1000 students 94% Power is achieved."],"type":"scatter","mode":"lines","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[-39.5,1049.5],"y":[0.80000000000000004,0.80000000000000004],"text":"","type":"scatter","mode":"lines","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)","dash":"dot"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":33.534246575342465,"r":9.4488188976377927,"b":82.86772372631502,"l":45.247905655628671},"font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"Statistical Power as a Function of the Number of Students","font":{"color":"rgba(0,0,0,1)","family":"","size":17.534246575342465},"x":0.5,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-39.5,1049.5],"tickmode":"array","ticktext":["50","150","250","350","450","550","650","750","850","950"],"tickvals":[50.000000000000014,150,250,350,450,550,650,750,850,949.99999999999989],"categoryorder":"array","categoryarray":["50","150","250","350","450","550","650","750","850","950"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"Number of students","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.050000000000000003,1.05],"tickmode":"array","ticktext":["0.0","0.2","0.4","0.6","0.8","1.0"],"tickvals":[0,0.20000000000000001,0.40000000000000002,0.60000000000000009,0.80000000000000004,1],"categoryorder":"array","categoryarray":["0.0","0.2","0.4","0.6","0.8","1.0"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"Statistical Power","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"3810791979c2":{"x":{},"y":{},"text":{},"type":"scatter"},"3810200968dd":{"yintercept":{}}},"cur_data":"3810791979c2","visdat":{"3810791979c2":["function (y) ","x"],"3810200968dd":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p>Note that you can move your cursor across the line to learn about the exact level of statistical power.</p>
+</section>
+</section>
+</section>
+<section id="your-turn" class="level2">
+<h2 class="anchored" data-anchor-id="your-turn">Your turn!</h2>
+<section id="scenario-2-finding-the-minimum-required-sample-size" class="level3">
+<h3 class="anchored" data-anchor-id="scenario-2-finding-the-minimum-required-sample-size">Scenario 2: Finding the Minimum Required Sample Size</h3>
+<p><em>How many students are required to adequately power an IRT to detect a certain hypothesized effect?</em></p>
+<p>To find the MRSS, use the <code>mrss.ira()</code> function.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In the <a href="https://cran.r-project.org/web/packages/PowerUpR/PowerUpR.pdf">PowerUpR Documentation</a> you will find the following default code:</p>
+<p><code>mrss.ira(es=.25, power=.80, alpha=.05, two.tailed=TRUE, n0=10, tol=.10, p=.50, g1=0, r21=0)</code></p>
+<p>Note that the arguments <code>n0</code> and <code>tol</code> are used to set the starting value and the tolerance in the iterative process to determine the MRSS. Here, you can keep the default values. Note further that, for the moment, you can ignore the covariate arguments <code>g1</code> and <code>r21</code>.</p>
+</div>
+</div>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Exercises</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">R Code Solutions</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<ol type="1">
+<li>Calculate the number of students needed for an IRT to detect <em>MDES</em> = .22 in a two-tailed test with 5% Type I error rate and 80% power, when the design is balanced (i.e., the exact MRSS for our worked example).</li>
+</ol>
+<p>All else being constant, what happens when…</p>
+<ol start="2" type="1">
+<li><p>increasing power from 80% to 90%?</p></li>
+<li><p>decreasing the Type I error rate to 1%?</p></li>
+<li><p>75% of the sample is assigned to the treatment group and 25% is assigned to the control group?</p></li>
+</ol>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<ol type="1">
+<li>Calculate the number of students needed for an IRT to detect <em>MDES</em> = .22 in a two-tailed test with 5% Type I error rate and 80% power, when the design is balanced (i.e., the exact MRSS for our worked example).</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mrss.ira</span>(<span class="at">es=</span>.<span class="dv">22</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The MRSS is <em>N</em> = 651 students.</p>
+<p>All else being constant, what happens when…</p>
+<ol start="2" type="1">
+<li>increasing power from 80% to 90%?</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mrss.ira</span>(<span class="at">power=</span>.<span class="dv">90</span>, <span class="at">es=</span>.<span class="dv">22</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The MRSS increases to <em>N</em> = 870 students.</p>
+<ol start="3" type="1">
+<li>decreasing the Type I error rate to 1%?</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mrss.ira</span>(<span class="at">alpha=</span>.<span class="dv">01</span>, <span class="at">es=</span>.<span class="dv">22</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The MRSS increases to <em>N</em> = 968 students.</p>
+<ol start="4" type="1">
+<li>75% of the sample is assigned to the treatment group and 25% is assigned to the control group?</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mrss.ira</span>(<span class="at">p=</span>.<span class="dv">75</span>, <span class="at">es=</span>.<span class="dv">22</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The MRSS increases to <em>N</em> = 867 students.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="scenario-3-computing-the-minimum-detectable-effect-size" class="level3">
+<h3 class="anchored" data-anchor-id="scenario-3-computing-the-minimum-detectable-effect-size">Scenario 3: Computing the Minimum Detectable Effect Size</h3>
+<p><em>Which </em>MDES* is attainable in an adequately powered IRT, given a specified sample size?*</p>
+<p>To compute the MDES, use the <code>mdes.ira()</code> function.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In the <a href="https://cran.r-project.org/web/packages/PowerUpR/PowerUpR.pdf">PowerUpR Documentation</a> you will find the following default code:</p>
+<p><code>mdes.ira(power=.80, alpha=.05, two.tailed=TRUE, p=.50, g1=0, r21=0, n)</code></p>
+<p>Again, ignore the covariate arguments <code>g1</code> and <code>r21</code> for the moment.</p>
+</div>
+</div>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Exercises</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">R Code Solutions</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<p>Calculate the smallest size of effect that can be uncovered with confidence (i.e., α = .05, two-tailed, 1-β = .80) in an IRT…</p>
+<ol type="1">
+<li><p>where 125 students receive the treatment, and 375 do “business as usual”.</p></li>
+<li><p>where 375 students receive the treatment, and 125 do “business as usual”.</p></li>
+</ol>
+<p>Plot the <em>MDES</em> as a function of the sample size…</p>
+<ol start="3" type="1">
+<li><p>for the unbalanced design in 1.</p></li>
+<li><p>for a balanced design and compare with the plot from 3.</p></li>
+</ol>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<p>Calculate the smallest size of effect that can be uncovered with confidence (i.e., α = .05, two-tailed, 1-β = .80) in an IRT…</p>
+<ol type="1">
+<li>where 125 students receive the treatment, and 375 do “business as usual”.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mdes.ira</span>(<span class="at">p=</span>.<span class="dv">25</span>, <span class="at">n=</span><span class="dv">500</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Minimum detectable effect size: 
+--------------------------------------- 
+ 0.29 95% CI [0.087,0.493]
+---------------------------------------
+Degrees of freedom: 498
+Standardized standard error: 0.103
+Type I error rate: 0.05
+Type II error rate: 0.2
+Two-tailed test: TRUE</code></pre>
+</div>
+</div>
+<p>The <em>MDES</em> equals 0.29, with 95% CI [0.09, 0.49].</p>
+<ol start="2" type="1">
+<li>where 375 students receive the treatment, and 125 do “business as usual”.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mdes.ira</span>(<span class="at">p=</span>.<span class="dv">75</span>, <span class="at">n=</span><span class="dv">500</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Minimum detectable effect size: 
+--------------------------------------- 
+ 0.29 95% CI [0.087,0.493]
+---------------------------------------
+Degrees of freedom: 498
+Standardized standard error: 0.103
+Type I error rate: 0.05
+Type II error rate: 0.2
+Two-tailed test: TRUE</code></pre>
+</div>
+</div>
+<p>The results are exactly the same: The <em>MDES</em> equals 0.29, with 95% CI [0.09, 0.49].</p>
+<p>Plot the <em>MDES</em> as a function of the sample size…</p>
+<ol start="3" type="1">
+<li>for the unbalanced design in 1.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>s3<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">mdes.ira</span>(<span class="at">p=</span>.<span class="dv">25</span>, <span class="at">n=</span><span class="dv">500</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(s3<span class="fl">.1</span>, <span class="at">ypar=</span><span class="st">"mdes"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="single-level_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ol start="4" type="1">
+<li>for a balanced design and compare with the plot from 3.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>s3<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">mdes.ira</span>(<span class="at">n=</span><span class="dv">500</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Minimum detectable effect size: 
+--------------------------------------- 
+ 0.251 95% CI [0.075,0.427]
+---------------------------------------
+Degrees of freedom: 498
+Standardized standard error: 0.089
+Type I error rate: 0.05
+Type II error rate: 0.2
+Two-tailed test: TRUE</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(s3<span class="fl">.2</span>, <span class="at">ypar=</span><span class="st">"mdes"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="single-level_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The balanced design is more efficient than the unbalanced design, because the treatment effect can be estimated with greater precision.</p>
+</div>
+</div>
+</div>
+
+
+
+</section>
+</section>
+
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-line-spacing="2" role="list">
+<div id="ref-brunner2023" class="csl-entry" role="listitem">
+Brunner, M., Stallasch, S. E., &amp; Lüdtke, O. (2023). Empirical Benchmarks to Interpret Intervention Effects on Student Achievement in Elementary and Secondary School: Meta-Analytic Results from Germany. <em>Journal of Research on Educational Effectiveness</em>, <em>17</em>(1), 119–157. <a href="https://doi.org/10.1080/19345747.2023.2175753">https://doi.org/10.1080/19345747.2023.2175753</a>
+</div>
+<div id="ref-hedges2007" class="csl-entry" role="listitem">
+Hedges, L. V., &amp; Hedberg, E. C. (2007). Intraclass Correlation Values for Planning Group-Randomized Trials in Education. <em>Educational Evaluation and Policy Analysis</em>, <em>29</em>(1), 60–87. <a href="https://doi.org/10.3102/0162373707299706">https://doi.org/10.3102/0162373707299706</a>
+</div>
+<div id="ref-liu2013" class="csl-entry" role="listitem">
+Liu, X. S. (2013). <em>Statistical power analysis for the social and behavioral sciences</em>. Routledge. <a href="https://doi.org/10.4324/9780203127698">https://doi.org/10.4324/9780203127698</a>
+</div>
+<div id="ref-stallasch2023" class="csl-entry" role="listitem">
+Stallasch, S. E., Lüdtke, O., Artelt, C., Hedges, L. V., &amp; Brunner, M. (2023). <em>Single- and multilevel perspectives on covariate selection in randomized intervention studies on student achievement</em>. <a href="http://dx.doi.org/10.31234/osf.io/5ajmg">http://dx.doi.org/10.31234/osf.io/5ajmg</a>
+</div>
+</div></section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>In PowerUpR, the standardized standard error is calculated as <span class="math inline">\(SSE=\sqrt{\frac{1-R^2}{P(1-P)n}}\)</span>, and is as such expressed as the ratio of the effect size (i.e., the <em>MDES</em>) to the noncentrality parameter <span class="math inline">\(\lambda\)</span>: <span class="math inline">\(SSE=\frac{MDES}{\lambda}\)</span>. Therefore, in PowerUpR, the noncentrality parameter <span class="math inline">\(\lambda\)</span> is equated with the multiplier <span class="math inline">\(M_{n-g^*-2}\)</span> <span class="citation" data-cites="stallasch2023">(see e.g., <a href="#ref-stallasch2023" role="doc-biblioref">Stallasch et al., 2023</a>)</span>.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

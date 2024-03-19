@@ -1,0 +1,22 @@
+/* css styles */
+{
+  font-family: Arial;
+  font-size: 11pt;
+}
+
+/* Headings: */
+h4{
+  color: #2C3E50;
+}
+
+/* Tables: */
+th{
+  font-family: Arial;
+  font-size: 11pt;
+}
+
+.table>tbody>tr>td{
+	font-family: Arial;
+    font-size: 11pt;
+    line-height: 1;
+}

@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Power Analysis in R - Design Parameters</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Power Analysis in R</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html" rel="" target="">
+ <span class="menu-text">Intro</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./dp.html" rel="" target="" aria-current="page">
+ <span class="menu-text">Design Parameters</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./single-level.html" rel="" target="">
+ <span class="menu-text">Single-Level Designs</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./multilevel.html" rel="" target="">
+ <span class="menu-text">Multilevel Designs</span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools ms-auto">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#multilevel-design-parameters-for-the-german-school-context" id="toc-multilevel-design-parameters-for-the-german-school-context" class="nav-link active" data-scroll-target="#multilevel-design-parameters-for-the-german-school-context">Multilevel Design Parameters for the German School Context</a>
+  <ul class="collapse">
+  <li><a href="#overview-of-data-frames" id="toc-overview-of-data-frames" class="nav-link" data-scroll-target="#overview-of-data-frames">Overview of Data Frames</a></li>
+  <li><a href="#structure-of-data-frames" id="toc-structure-of-data-frames" class="nav-link" data-scroll-target="#structure-of-data-frames">Structure of Data Frames</a></li>
+  <li><a href="#achievement-domains" id="toc-achievement-domains" class="nav-link" data-scroll-target="#achievement-domains">Achievement Domains</a></li>
+  </ul></li>
+  <li><a href="#advanced-covariate-selection-for-single--and-multilevel-designs" id="toc-advanced-covariate-selection-for-single--and-multilevel-designs" class="nav-link" data-scroll-target="#advanced-covariate-selection-for-single--and-multilevel-designs">Advanced Covariate Selection for Single- and Multilevel Designs</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content column-page-left" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Design Parameters</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="cell">
+<style type="text/css">
+.panel-tabset .nav-item {
+  font-size: 13pt;
+}
+</style>
+</div>
+<p>To plan sensitive (i.e., sufficiently powered and precise) RTs on student achievement, reliable estimates of design parameters that adequately mirror the (clustered) variance structure of the intervention’s target outcome are critical.</p>
+<p>These design parameters include:</p>
+<ul>
+<li><p><strong>Intraclass Correlation Coefficients (ICCs)</strong><br>
+ρ values that quantify achievement differences between clusters</p></li>
+<li><p><strong>Explained Variances</strong><br>
+<em>R</em><sup>2</sup> values that quantify the proportions of explained variance by covariates at the various levels</p></li>
+</ul>
+<p>Generally, design parameters should match the peculiarities of the target research context as closely as possible (e.g., the target population of the intervention, the specific hierarchical data structure, and the achievement outcome under investigation). There are multiple resources of empirical values of ρ and <em>R</em><sup>2</sup>. A review of existing international and German research on multilevel design parameters for student achievement can be found in <span class="citation" data-cites="stallasch2021">Stallasch et al. (<a href="#ref-stallasch2021" role="doc-biblioref">2021</a>)</span>. A meta-analytic integration of both single- and multilevel <em>R</em><sup>2</sup> values is provided in <span class="citation" data-cites="stallasch2023">Stallasch et al. (<a href="#ref-stallasch2023" role="doc-biblioref">2023</a>)</span>. A useful collection of respective estimates for the United States is the <a href="http://stateva.ci.northwestern.edu/">‘Online Intraclass Correlation Database’</a> created by Larry V. Hedges and colleagues and hosted by the Institute for Policy Research at the Northwestern University.</p>
+<section id="multilevel-design-parameters-for-the-german-school-context" class="level2">
+<h2 class="anchored" data-anchor-id="multilevel-design-parameters-for-the-german-school-context">Multilevel Design Parameters for the German School Context</h2>
+<p>In this workshop, we draw on our own compilation of ρ and <em>R</em><sup>2</sup> values (and corresponding standard errors) for the German school system published in <span class="citation" data-cites="stallasch2021">Stallasch et al. (<a href="#ref-stallasch2021" role="doc-biblioref">2021</a>)</span>. Based on three longitudinal German large-scale assessments (NEPS, PISA-I+, and DESI) which provided achievement data across the entire school career (Grades 1 to 12), we generated design parameters that apply to:</p>
+<ul>
+<li><p>Several student populations</p></li>
+<li><p>Both two-level (students within schools) and three-level designs (students within classrooms within schools)</p></li>
+<li><p>A broad array of domains</p></li>
+</ul>
+<p><em>R</em><sup>2</sup> values at each level are available for three covariate sets:</p>
+<ul>
+<li><p>Pretest scores</p></li>
+<li><p>Sociodemographic characteristics (comprising students’ gender and migration background, as well as parents’ educational attainment, and families’ HISEI)</p></li>
+<li><p>The combination thereof</p></li>
+</ul>
+<p>The design parameters are provided via an interactive Excel file (Supplemental Online Material B) that comes with a detailed introduction on the application scopes of the various sets of estimates. This document can be downloaded from the <a href="https://osf.io/2w8nt/">OSF</a> or the <a href="https://www.tandfonline.com/doi/suppl/10.1080/19345747.2020.1823539?scroll=top">Journal’s website</a>.</p>
+<p>To facilitate the workflow in R (e.g., to avoid time-consuming and error-prone C&amp;P of estimates), an .rda file that encloses the full compilation of design parameters (as a list of data frames) is shared in <a href="https://github.com/sophiestallasch/2022-workshop-CRT">this course’s repository on github</a> which is ready to be directly loaded:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load design parameters from github</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="fu">url</span>(<span class="st">"https://github.com/sophiestallasch/2022-workshop-CRT/blob/main/data/multides1.rda?raw=true"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>If you run into problems, <a href="https://github.com/sophiestallasch/2022-workshop-CRT/blob/main/data/multides1.rda?raw=true">click here</a> to download the data to your local machine and then load it into R.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># inspect list</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(multides1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                       Length Class  Mode
+B1_General             28     tbl_df list
+B2_General_ND          14     tbl_df list
+B3_Adjusted            28     tbl_df list
+B4_Adjusted_ND         14     tbl_df list
+B5_Academic            28     tbl_df list
+B6_Academic_ND         14     tbl_df list
+B7_Non-Academic        28     tbl_df list
+B8_Non-Academic_ND     14     tbl_df list
+B9_General-2l          20     tbl_df list
+B10_General-2l_ND      10     tbl_df list
+B11_Adjusted-2l        20     tbl_df list
+B12_Adjusted-2l_ND     10     tbl_df list
+B13_Academic-2l        20     tbl_df list
+B14_Academic-2l_ND     10     tbl_df list
+B15_Non-Academic-2l    20     tbl_df list
+B16_Non-Academic-2l_ND 10     tbl_df list</code></pre>
+</div>
+</div>
+<p>The list contains 16 data frames, that can be grouped into two broad classes:</p>
+<ul>
+<li><p><strong>Point Estimates and Standard Errors</strong><br>
+Data frames B1, B3, B5, B7, B9, B11, B13, and B15 contain the full sets of (population-specific) empirical estimates of design parameters for each domain, subdomain, and grade, along with their standard errors.</p></li>
+<li><p><strong>Normative Distributions</strong><br>
+Data frames B2, B4, B6, B8, B10, B12, B14, and B16 (all data frames ending with “_ND”) contain (population-specific) normative distributions (i.e., minimum, 25th percentile, median, 75th percentile, and maximum) of those design parameters summarized across domains and/or grades. These distributions can serve as guesstimates to plan studies whose target domain and/or grade is not covered in <span class="citation" data-cites="stallasch2021">Stallasch et al. (<a href="#ref-stallasch2021" role="doc-biblioref">2021</a>)</span>.</p></li>
+</ul>
+<section id="overview-of-data-frames" class="level3">
+<h3 class="anchored" data-anchor-id="overview-of-data-frames">Overview of Data Frames</h3>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:13px;
+  overflow:hidden;padding:1px 2px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:13px;
+  font-weight:normal;overflow:hidden;padding:1px 2px;word-break:normal;}
+.tg .tg-d80r{border-color:#9b9b9b;font-family:Arial, Helvetica, sans-serif !important;font-size:13px;text-align:center;
+  vertical-align:middle}
+.tg .tg-6hvx{border-color:#9b9b9b;font-family:Arial, Helvetica, sans-serif !important;font-size:13px;text-align:left;
+  vertical-align:middle}
+.tg .tg-sp0n{background-color:#efefef;border-color:#9b9b9b;font-family:Arial, Helvetica, sans-serif !important;font-size:13px;
+  text-align:left;vertical-align:middle}
+.tg .tg-sqw7{background-color:#2c3e50;border-color:#9b9b9b;color:#ffffff;font-family:Arial, Helvetica, sans-serif !important;
+  font-size:13px;font-weight:bold;text-align:left;vertical-align:middle}
+.tg .tg-snkp{background-color:#2c3e50;border-color:#9b9b9b;color:#ffffff;font-family:Arial, Helvetica, sans-serif !important;
+  font-size:13px;font-weight:bold;text-align:center;vertical-align:middle}
+.tg .tg-vv2j{background-color:#efefef;border-color:#9b9b9b;font-family:Arial, Helvetica, sans-serif !important;font-size:13px;
+  text-align:center;vertical-align:middle}
+</style>
+
+<table class="tg" style="undefined;table-layout: fixed; width: 828px">
+<colgroup>
+<col style="width: 165px">
+<col style="width: 210px">
+<col style="width: 41px">
+<col style="width: 210px">
+<col style="width: 95px">
+<col style="width: 60px">
+<col style="width: 75px">
+<col style="width: 55px">
+</colgroup>
+<thead>
+<tr>
+<th class="tg-sqw7" rowspan="2">
+Data frame
+</th>
+<th class="tg-sqw7" rowspan="2">
+Description
+</th>
+<th class="tg-sqw7" rowspan="2">
+Grades
+</th>
+<th class="tg-sqw7" rowspan="2">
+Scope of application
+</th>
+<th class="tg-sqw7" rowspan="2">
+Target design
+</th>
+<th class="tg-snkp" colspan="3">
+Hierarchical structure
+</th>
+</tr>
+<tr>
+<th class="tg-snkp">
+L1
+</th>
+<th class="tg-snkp">
+L2
+</th>
+<th class="tg-snkp">
+L3
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tg-6hvx" rowspan="2">
+B1_General
+</td>
+<td class="tg-6hvx" rowspan="2">
+Design parameters for the general (total) student population
+</td>
+<td class="tg-6hvx">
+1-10
+</td>
+<td class="tg-6hvx" rowspan="2">
+Nationwide/ across all school types
+</td>
+<td class="tg-6hvx">
+3L-(MS)CRT
+</td>
+<td class="tg-d80r">
+Students
+</td>
+<td class="tg-d80r">
+Classrooms
+</td>
+<td class="tg-d80r">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-6hvx">
+11-12
+</td>
+<td class="tg-6hvx">
+2L-MSIRT/CRT
+</td>
+<td class="tg-d80r">
+Students
+</td>
+<td class="tg-d80r">
+-
+</td>
+<td class="tg-d80r">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-sp0n" rowspan="2">
+B2_General_ND
+</td>
+<td class="tg-sp0n" rowspan="2">
+Normative distributions of B1
+</td>
+<td class="tg-sp0n">
+1-10
+</td>
+<td class="tg-sp0n" rowspan="2">
+Nationwide/ across all school types; target domain and/or grade not covered
+</td>
+<td class="tg-sp0n">
+3L-(MS)CRT
+</td>
+<td class="tg-vv2j">
+Students
+</td>
+<td class="tg-vv2j">
+Classrooms
+</td>
+<td class="tg-vv2j">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-sp0n">
+11-12
+</td>
+<td class="tg-sp0n">
+2L-MSIRT/CRT
+</td>
+<td class="tg-vv2j">
+Students
+</td>
+<td class="tg-vv2j">
+-
+</td>
+<td class="tg-vv2j">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-6hvx" rowspan="2">
+B3_Adjusted
+</td>
+<td class="tg-6hvx" rowspan="2">
+Design parameters for the general (total) student population, adjusted for mean-level differences between school types
+</td>
+<td class="tg-6hvx">
+5-10
+</td>
+<td class="tg-6hvx" rowspan="2">
+1 school type in the non-academic track
+</td>
+<td class="tg-6hvx">
+3L-(MS)CRT
+</td>
+<td class="tg-d80r">
+Students
+</td>
+<td class="tg-d80r">
+Classrooms
+</td>
+<td class="tg-d80r">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-6hvx">
+11-12
+</td>
+<td class="tg-6hvx">
+2L-MSIRT/CRT
+</td>
+<td class="tg-d80r">
+Students
+</td>
+<td class="tg-d80r">
+-
+</td>
+<td class="tg-d80r">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-sp0n" rowspan="2">
+B4_Adjusted_ND
+</td>
+<td class="tg-sp0n" rowspan="2">
+Normative distributions of B3
+</td>
+<td class="tg-sp0n">
+5-10
+</td>
+<td class="tg-sp0n" rowspan="2">
+1 school type in the non-academic track; target domain and/or grade not covered
+</td>
+<td class="tg-sp0n">
+3L-(MS)CRT
+</td>
+<td class="tg-vv2j">
+Students
+</td>
+<td class="tg-vv2j">
+Classrooms
+</td>
+<td class="tg-vv2j">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-sp0n">
+11-12
+</td>
+<td class="tg-sp0n">
+2L-MSIRT/CRT
+</td>
+<td class="tg-vv2j">
+Students
+</td>
+<td class="tg-vv2j">
+-
+</td>
+<td class="tg-vv2j">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-6hvx" rowspan="2">
+B5_Academic
+</td>
+<td class="tg-6hvx" rowspan="2">
+Design parameters for the academic track
+</td>
+<td class="tg-6hvx">
+5-10
+</td>
+<td class="tg-6hvx" rowspan="2">
+Academic track school (“Gymnasium”)
+</td>
+<td class="tg-6hvx">
+3L-(MS)CRT
+</td>
+<td class="tg-d80r">
+Students
+</td>
+<td class="tg-d80r">
+Classrooms
+</td>
+<td class="tg-d80r">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-6hvx">
+11-12
+</td>
+<td class="tg-6hvx">
+2L-MSIRT/CRT
+</td>
+<td class="tg-d80r">
+Students
+</td>
+<td class="tg-d80r">
+-
+</td>
+<td class="tg-d80r">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-sp0n" rowspan="2">
+B6_Academic_ND
+</td>
+<td class="tg-sp0n" rowspan="2">
+Normative distributions of B5
+</td>
+<td class="tg-sp0n">
+5-10
+</td>
+<td class="tg-sp0n" rowspan="2">
+Academic track school (“Gymnasium”); target domain and/or grade not covered
+</td>
+<td class="tg-sp0n">
+3L-(MS)CRT
+</td>
+<td class="tg-vv2j">
+Students
+</td>
+<td class="tg-vv2j">
+Classrooms
+</td>
+<td class="tg-vv2j">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-sp0n">
+11-12
+</td>
+<td class="tg-sp0n">
+2L-MSIRT/CRT
+</td>
+<td class="tg-vv2j">
+Students
+</td>
+<td class="tg-vv2j">
+-
+</td>
+<td class="tg-vv2j">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-6hvx" rowspan="2">
+B7_Non-Academic
+</td>
+<td class="tg-6hvx" rowspan="2">
+Design parameters for the non-academic track
+</td>
+<td class="tg-6hvx">
+5-10
+</td>
+<td class="tg-6hvx" rowspan="2">
+2+ different school types in the non-academic track
+</td>
+<td class="tg-6hvx">
+3L-(MS)CRT
+</td>
+<td class="tg-d80r">
+Students
+</td>
+<td class="tg-d80r">
+Classrooms
+</td>
+<td class="tg-d80r">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-6hvx">
+11-12
+</td>
+<td class="tg-6hvx">
+2L-MSIRT/CRT
+</td>
+<td class="tg-d80r">
+Students
+</td>
+<td class="tg-d80r">
+-
+</td>
+<td class="tg-d80r">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-sp0n" rowspan="2">
+B8_Non-Academic_ND
+</td>
+<td class="tg-sp0n" rowspan="2">
+Normative distributions of B7
+</td>
+<td class="tg-sp0n">
+5-10
+</td>
+<td class="tg-sp0n" rowspan="2">
+2+ different school types in the non-academic track; target domain and/or grade not covered
+</td>
+<td class="tg-sp0n">
+3L-(MS)CRT
+</td>
+<td class="tg-vv2j">
+Students
+</td>
+<td class="tg-vv2j">
+Classrooms
+</td>
+<td class="tg-vv2j">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-sp0n">
+11-12
+</td>
+<td class="tg-sp0n">
+2L-MSIRT/CRT
+</td>
+<td class="tg-vv2j">
+Students
+</td>
+<td class="tg-vv2j">
+-
+</td>
+<td class="tg-vv2j">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-6hvx">
+B9_General-2l
+</td>
+<td class="tg-6hvx">
+Design parameters for the general (total) student population; for two-level designs
+</td>
+<td class="tg-6hvx">
+1-10
+</td>
+<td class="tg-6hvx">
+Nationwide/ across all school types
+</td>
+<td class="tg-6hvx">
+2L-MSIRT/CRT
+</td>
+<td class="tg-d80r">
+Students
+</td>
+<td class="tg-d80r">
+-
+</td>
+<td class="tg-d80r">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-sp0n">
+B10_General-2l_ND
+</td>
+<td class="tg-sp0n">
+Normative distributions of B9
+</td>
+<td class="tg-sp0n">
+1-10
+</td>
+<td class="tg-sp0n">
+Nationwide/ across all school types; target domain and/or grade not covered
+</td>
+<td class="tg-sp0n">
+2L-MSIRT/CRT
+</td>
+<td class="tg-vv2j">
+Students
+</td>
+<td class="tg-vv2j">
+-
+</td>
+<td class="tg-vv2j">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-6hvx">
+B11_Adjusted-2l
+</td>
+<td class="tg-6hvx">
+Design parameters for the general (total) student population, adjusted for mean-level differences between school types; for two-level designs
+</td>
+<td class="tg-6hvx">
+5-10
+</td>
+<td class="tg-6hvx">
+1 school type in the non-academic track
+</td>
+<td class="tg-6hvx">
+2L-MSIRT/CRT
+</td>
+<td class="tg-d80r">
+Students
+</td>
+<td class="tg-d80r">
+-
+</td>
+<td class="tg-d80r">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-sp0n">
+B12_Adjusted-2l_ND
+</td>
+<td class="tg-sp0n">
+Normative distributions of B11
+</td>
+<td class="tg-sp0n">
+5-10
+</td>
+<td class="tg-sp0n">
+1 school type in the non-academic track; target domain and/or grade not covered
+</td>
+<td class="tg-sp0n">
+2L-MSIRT/CRT
+</td>
+<td class="tg-vv2j">
+Students
+</td>
+<td class="tg-vv2j">
+-
+</td>
+<td class="tg-vv2j">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-6hvx">
+B13_Academic-2l
+</td>
+<td class="tg-6hvx">
+Design parameters for the academic track; for two-level designs
+</td>
+<td class="tg-6hvx">
+5-10
+</td>
+<td class="tg-6hvx">
+Academic track school (“Gymnasium”)
+</td>
+<td class="tg-6hvx">
+2L-MSIRT/CRT
+</td>
+<td class="tg-d80r">
+Students
+</td>
+<td class="tg-d80r">
+-
+</td>
+<td class="tg-d80r">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-sp0n">
+B14_Academic-2l_ND
+</td>
+<td class="tg-sp0n">
+Normative distributions of B13
+</td>
+<td class="tg-sp0n">
+5-10
+</td>
+<td class="tg-sp0n">
+Academic track school (“Gymnasium”); target domain and/or grade not covered
+</td>
+<td class="tg-sp0n">
+2L-MSIRT/CRT
+</td>
+<td class="tg-vv2j">
+Students
+</td>
+<td class="tg-vv2j">
+-
+</td>
+<td class="tg-vv2j">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-6hvx">
+B15_Non-Academic-2l
+</td>
+<td class="tg-6hvx">
+Design parameters for the non-academic track; for two-level designs
+</td>
+<td class="tg-6hvx">
+5-10
+</td>
+<td class="tg-6hvx">
+2+ different school types in the non-academic track
+</td>
+<td class="tg-6hvx">
+2L-MSIRT/CRT
+</td>
+<td class="tg-d80r">
+Students
+</td>
+<td class="tg-d80r">
+-
+</td>
+<td class="tg-d80r">
+Schools
+</td>
+</tr>
+<tr>
+<td class="tg-sp0n">
+B16_Non-Academic-2l_ND
+</td>
+<td class="tg-sp0n">
+Normative distributions of B15
+</td>
+<td class="tg-sp0n">
+5-10
+</td>
+<td class="tg-sp0n">
+2+ different school types in the non-academic track; target domain and/or grade not covered
+</td>
+<td class="tg-sp0n">
+2L-MSIRT/CRT
+</td>
+<td class="tg-vv2j">
+Students
+</td>
+<td class="tg-vv2j">
+-
+</td>
+<td class="tg-vv2j">
+Schools
+</td>
+</tr>
+</tbody>
+
+</table>
+<p>We also created a flow chart to guide the choice of appropriate design parameters as a function of key characteristics of the target intervention.</p>
+<p><img src="img/flowchart.png" class="img-fluid"></p>
+</section>
+<section id="structure-of-data-frames" class="level3">
+<h3 class="anchored" data-anchor-id="structure-of-data-frames">Structure of Data Frames</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Point Estimates and Standard Errors</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Normative Distributions</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>Data frames that contain the point estimates and standard errors (i.e., B1, B3, B5, B7, B9, B11, B13, and B15) are structured as follows.</p>
+<table class="table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 79%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>domain</td>
+<td>Domain of achievement outcome (for details, see section ‘Achievement Domains’)</td>
+</tr>
+<tr class="even">
+<td>subdomain</td>
+<td>Subdomain of achievement outcome (for details, see section ‘Achievement Domains’)</td>
+</tr>
+<tr class="odd">
+<td>grade</td>
+<td>Grade of achievement outcome</td>
+</tr>
+<tr class="even">
+<td>study</td>
+<td>Large-scale assessment study (and cohort): ‘NEPS-SC2’, ‘NEPS-SC3’, ‘NEPS-SC4’, ‘PISA-I+’, ‘DESI’</td>
+</tr>
+<tr class="odd">
+<td>wave</td>
+<td>Wave of large-scale assessment study</td>
+</tr>
+<tr class="even">
+<td>model</td>
+<td>Hierarchical structure of specified multilevel model: ‘3l’, ‘2l’</td>
+</tr>
+<tr class="odd">
+<td>icc_l2.est</td>
+<td>ICC at the classroom level ρ<sub>L2</sub></td>
+</tr>
+<tr class="even">
+<td>icc_l2.se</td>
+<td>SE of ICC at the classroom level <em>SE</em>(ρ<sub>L2</sub>)</td>
+</tr>
+<tr class="odd">
+<td>icc_l3.est</td>
+<td>ICC at the school level ρ<sub>L3</sub></td>
+</tr>
+<tr class="even">
+<td>icc_l3.se</td>
+<td>SE of ICC at the school level <em>SE</em>(ρ<sub>L3</sub>)</td>
+</tr>
+<tr class="odd">
+<td>r2_l1_pretest.est</td>
+<td>Explained variance by a pretest at the student level <em>R</em><sup>2</sup><sub>L1</sub></td>
+</tr>
+<tr class="even">
+<td>r2_l1_pretest.se</td>
+<td>SE of explained variance by a pretest at the student level <em>SE</em>(<em>R</em><sup>2</sup><sub>L1</sub>)</td>
+</tr>
+<tr class="odd">
+<td>r2_l2_pretest.est</td>
+<td>Explained variance by a pretest at the classroom level <em>R</em><sup>2</sup><sub>L2</sub></td>
+</tr>
+<tr class="even">
+<td>r2_l2_pretest.se</td>
+<td>SE of explained variance by a pretest at the classroom level <em>SE</em>(<em>R</em><sup>2</sup><sub>L2</sub>)</td>
+</tr>
+<tr class="odd">
+<td>r2_l3_pretest.est</td>
+<td>Explained variance by a pretest at the school level <em>R</em><sup>2</sup><sub>L3</sub></td>
+</tr>
+<tr class="even">
+<td>r2_l3_pretest.se</td>
+<td>SE of explained variance by a pretest at the school level <em>SE</em>(<em>R</em><sup>2</sup><sub>L3</sub>)</td>
+</tr>
+<tr class="odd">
+<td>r2_l1_ses.est</td>
+<td>Explained variance by sociodemographics at the student level <em>R</em><sup>2</sup><sub>L1</sub></td>
+</tr>
+<tr class="even">
+<td>r2_l1_ses.se</td>
+<td>SE of explained variance by sociodemographics at the student level <em>SE</em>(<em>R</em><sup>2</sup><sub>L1</sub>)</td>
+</tr>
+<tr class="odd">
+<td>r2_l2_ses.est</td>
+<td>Explained variance by sociodemographics at the classroom level <em>R</em><sup>2</sup><sub>L2</sub></td>
+</tr>
+<tr class="even">
+<td>r2_l2_ses.se</td>
+<td>SE of explained variance by sociodemographics at the classroom level <em>SE</em>(<em>R</em><sup>2</sup><sub>L2</sub>)</td>
+</tr>
+<tr class="odd">
+<td>r2_l3_ses.est</td>
+<td>Explained variance by sociodemographics at the school level <em>R</em><sup>2</sup><sub>L3</sub></td>
+</tr>
+<tr class="even">
+<td>r2_l3_ses.se</td>
+<td>SE of explained variance by sociodemographics at the school level <em>SE</em>(<em>R</em><sup>2</sup><sub>L3</sub>)</td>
+</tr>
+<tr class="odd">
+<td>r2_l1_pretestses.est</td>
+<td>Explained variance by a pretest and sociodemographics at the student level <em>R</em><sup>2</sup><sub>L1</sub></td>
+</tr>
+<tr class="even">
+<td>r2_l1_pretestses.se</td>
+<td>SE of explained variance by a pretest and sociodemographics at the student level <em>SE</em>(<em>R</em><sup>2</sup><sub>L1</sub>)</td>
+</tr>
+<tr class="odd">
+<td>r2_l2_pretestses.est</td>
+<td>Explained variance by a pretest and sociodemographics at the classroom level <em>R</em><sup>2</sup><sub>L2</sub></td>
+</tr>
+<tr class="even">
+<td>r2_l2_pretestses.se</td>
+<td>SE of explained variance by a pretest and sociodemographics at the classroom level <em>SE</em>(<em>R</em><sup>2</sup><sub>L2</sub>)</td>
+</tr>
+<tr class="odd">
+<td>r2_l3_pretestses.est</td>
+<td>Explained variance by a pretest and sociodemographics at the school level <em>R</em><sup>2</sup><sub>L3</sub></td>
+</tr>
+<tr class="even">
+<td>r2_l3_pretestses.se</td>
+<td>SE of explained variance by a pretest and sociodemographics at the school level <em>SE</em>(<em>R</em><sup>2</sup><sub>L3</sub>)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p>Data frames that contain normative distributions (i.e., B2, B4, B6, B8, B10, B12, B14, and B16) are structured as follows.</p>
+<table class="table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 79%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>domain</td>
+<td>Domain of summarized parameters (for details, see section ‘Achievement Domains’)</td>
+</tr>
+<tr class="even">
+<td>grade_range</td>
+<td>Grade range of summarized parameters</td>
+</tr>
+<tr class="odd">
+<td>statistic</td>
+<td>Summary statistic: ‘Minimum’, ‘25th Percentile’, ‘Median’, ‘75th Percentile’, ‘Maximum’</td>
+</tr>
+<tr class="even">
+<td>icc_l2.est</td>
+<td>ICC at the classroom level ρ<sub>L2</sub></td>
+</tr>
+<tr class="odd">
+<td>icc_l2.se</td>
+<td>SE of ICC at the classroom level <em>SE</em>(ρ<sub>L2</sub>)</td>
+</tr>
+<tr class="even">
+<td>icc_l3.est</td>
+<td>ICC at the school level ρ<sub>L3</sub></td>
+</tr>
+<tr class="odd">
+<td>icc_l3.se</td>
+<td>SE of ICC at the school level <em>SE</em>(ρ<sub>L3</sub>)</td>
+</tr>
+<tr class="even">
+<td>r2_l1_pretest.est</td>
+<td>Explained variance by a pretest at the student level <em>R</em><sup>2</sup><sub>L1</sub></td>
+</tr>
+<tr class="odd">
+<td>r2_l1_pretest.se</td>
+<td>SE of explained variance by a pretest at the student level <em>SE</em>(<em>R</em><sup>2</sup><sub>L1</sub>)</td>
+</tr>
+<tr class="even">
+<td>r2_l2_pretest.est</td>
+<td>Explained variance by a pretest at the classroom level <em>R</em><sup>2</sup><sub>L2</sub></td>
+</tr>
+<tr class="odd">
+<td>r2_l2_pretest.se</td>
+<td>SE of explained variance by a pretest at the classroom level <em>SE</em>(<em>R</em><sup>2</sup><sub>L2</sub>)</td>
+</tr>
+<tr class="even">
+<td>r2_l3_pretest.est</td>
+<td>Explained variance by a pretest at the school level <em>R</em><sup>2</sup><sub>L3</sub></td>
+</tr>
+<tr class="odd">
+<td>r2_l3_pretest.se</td>
+<td>SE of explained variance by a pretest at the school level <em>SE</em>(<em>R</em><sup>2</sup><sub>L3</sub>)</td>
+</tr>
+<tr class="even">
+<td>r2_l1_ses.est</td>
+<td>Explained variance by sociodemographics at the student level <em>R</em><sup>2</sup><sub>L1</sub></td>
+</tr>
+<tr class="odd">
+<td>r2_l1_ses.se</td>
+<td>SE of explained variance by sociodemographics at the student level <em>SE</em>(<em>R</em><sup>2</sup><sub>L1</sub>)</td>
+</tr>
+<tr class="even">
+<td>r2_l2_ses.est</td>
+<td>Explained variance by sociodemographics at the classroom level <em>R</em><sup>2</sup><sub>L2</sub></td>
+</tr>
+<tr class="odd">
+<td>r2_l2_ses.se</td>
+<td>SE of explained variance by sociodemographics at the classroom level <em>SE</em>(<em>R</em><sup>2</sup><sub>L2</sub>)</td>
+</tr>
+<tr class="even">
+<td>r2_l3_ses.est</td>
+<td>Explained variance by sociodemographics at the school level <em>R</em><sup>2</sup><sub>L3</sub></td>
+</tr>
+<tr class="odd">
+<td>r2_l3_ses.se</td>
+<td>SE of explained variance by sociodemographics at the school level <em>SE</em>(<em>R</em><sup>2</sup><sub>L3</sub>)</td>
+</tr>
+<tr class="even">
+<td>r2_l1_pretestses.est</td>
+<td>Explained variance by a pretest and sociodemographics at the student level <em>R</em><sup>2</sup><sub>L1</sub></td>
+</tr>
+<tr class="odd">
+<td>r2_l1_pretestses.se</td>
+<td>SE of explained variance by a pretest and sociodemographics at the student level <em>SE</em>(<em>R</em><sup>2</sup><sub>L1</sub>)</td>
+</tr>
+<tr class="even">
+<td>r2_l2_pretestses.est</td>
+<td>Explained variance by a pretest and sociodemographics at the classroom level <em>R</em><sup>2</sup><sub>L2</sub></td>
+</tr>
+<tr class="odd">
+<td>r2_l2_pretestses.se</td>
+<td>SE of explained variance by a pretest and sociodemographics at the classroom level <em>SE</em>(<em>R</em><sup>2</sup><sub>L2</sub>)</td>
+</tr>
+<tr class="even">
+<td>r2_l3_pretestses.est</td>
+<td>Explained variance by a pretest and sociodemographics at the school level <em>R</em><sup>2</sup><sub>L3</sub></td>
+</tr>
+<tr class="odd">
+<td>r2_l3_pretestses.se</td>
+<td>SE of explained variance by a pretest and sociodemographics at the school level <em>SE</em>(<em>R</em><sup>2</sup><sub>L3</sub>)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Note that three-level design parameters (students at L1 within classrooms at L2 within schools at L3) were estimated for grades 1 to 10 only. For grades 11 to 12, no L2 estimates are available as 11th and 12th graders did not attend intact classrooms, but rather the grouping of students varied depending on the subject taught. Therefore, two-level design parameters (students at L1 within schools at L3) were estimated instead. Two-level equivalents for grades 1 to 10 (i.e., ignoring classroom-level clustering) are also provided; you can access them in the data frames labeled with ‘-2l’.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Keep in mind that the top level (which is always the school level) is consistently indicated as ‘_l3’ across all data frames; irrespective of whether L2 estimates were estimated (i.e., also for two-level designs).</p>
+</div>
+</div>
+<p>Detailed information on the provided design parameters and underlying analysis models can be retrieved from <span class="citation" data-cites="stallasch2021">Stallasch et al. (<a href="#ref-stallasch2021" role="doc-biblioref">2021</a>)</span>.</p>
+</section>
+<section id="achievement-domains" class="level3">
+<h3 class="anchored" data-anchor-id="achievement-domains">Achievement Domains</h3>
+<p>The design parameters cover the following achievement domains.</p>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:15px;
+  overflow:hidden;padding:1px 2px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:15px;
+  font-weight:normal;overflow:hidden;padding:1px 2px;word-break:normal;}
+.tg .tg-f88r{background-color:#2c3e50;border-color:#c0c0c0;color:#ffffff;font-family:Arial, Helvetica, sans-serif !important;
+  font-size:15px;font-weight:bold;text-align:left;vertical-align:middle}
+.tg .tg-fzgn{border-color:#c0c0c0;font-family:Arial, Helvetica, sans-serif !important;font-size:15px;text-align:left;
+  vertical-align:middle}
+</style>
+
+<table class="tg">
+<thead>
+<tr>
+<th class="tg-f88r">
+Domain
+</th>
+<th class="tg-f88r">
+Subdomain
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tg-fzgn">
+Mathematics
+</td>
+<td class="tg-fzgn">
+Mathematics
+</td>
+</tr>
+<tr>
+<td class="tg-fzgn">
+Science
+</td>
+<td class="tg-fzgn">
+Science
+</td>
+</tr>
+<tr>
+<td class="tg-fzgn" rowspan="8">
+Verbal Skills in German (as First Language)
+</td>
+<td class="tg-fzgn">
+Reading Comprehension
+</td>
+</tr>
+<tr>
+<td class="tg-fzgn">
+Reading Speed
+</td>
+</tr>
+<tr>
+<td class="tg-fzgn">
+Spelling
+</td>
+</tr>
+<tr>
+<td class="tg-fzgn">
+Grammar
+</td>
+</tr>
+<tr>
+<td class="tg-fzgn">
+Vocabulary
+</td>
+</tr>
+<tr>
+<td class="tg-fzgn">
+Writing
+</td>
+</tr>
+<tr>
+<td class="tg-fzgn">
+Argumentation
+</td>
+</tr>
+<tr>
+<td class="tg-fzgn">
+Listening Comprehension
+</td>
+</tr>
+<tr>
+<td class="tg-fzgn" rowspan="6">
+Verbal Skills in English (as Foreign Language)
+</td>
+<td class="tg-fzgn">
+Reading Comprehension
+</td>
+</tr>
+<tr>
+<td class="tg-fzgn">
+Text Reconstruction (C-Test)
+</td>
+</tr>
+<tr>
+<td class="tg-fzgn">
+Language Awareness: Sociopragmatics
+</td>
+</tr>
+<tr>
+<td class="tg-fzgn">
+Language Awareness: Grammar
+</td>
+</tr>
+<tr>
+<td class="tg-fzgn">
+Writing
+</td>
+</tr>
+<tr>
+<td class="tg-fzgn">
+Listening Comprehension
+</td>
+</tr>
+<tr>
+<td class="tg-fzgn" rowspan="5">
+Domain-General Achievement
+</td>
+<td class="tg-fzgn">
+Declarative Metacognition
+</td>
+</tr>
+<tr>
+<td class="tg-fzgn">
+ICT Literacy
+</td>
+</tr>
+<tr>
+<td class="tg-fzgn">
+Problem Solving
+</td>
+</tr>
+<tr>
+<td class="tg-fzgn">
+Basic Cognitive Functions: Perception Speed
+</td>
+</tr>
+<tr>
+<td class="tg-fzgn">
+Basic Cognitive Functions: Reasoning
+</td>
+</tr>
+</tbody>
+
+</table>
+<p>Note that the (sub)domain character strings in the data frames are named exactly like shown here. For instance, if we want to filter design parameters for English text reconstruction from data frame B1, we could use the following code.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># filter English text reconstruction from data frame B1</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>eng_ctest <span class="ot">&lt;-</span> multides1[[<span class="st">"B1_General"</span>]] <span class="sc">|&gt;</span>  </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(domain <span class="sc">==</span> <span class="st">"Verbal Skills in English (as Foreign Language)"</span>, </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>         subdomain <span class="sc">==</span> <span class="st">"Text Reconstruction (C-Test)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>However, to avoid to type the full strings, better use pattern matching functions like from the <code>grep()</code> family instead that will do the job for you.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># better:</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>eng_ctest <span class="ot">&lt;-</span> multides1[[<span class="st">"B1_General"</span>]] <span class="sc">|&gt;</span>  </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">grepl</span>(<span class="st">"Eng"</span>, domain), </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>         <span class="fu">grepl</span>(<span class="st">"C-Test"</span>, subdomain))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s have a look at the filtered design parameters.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>eng_ctest <span class="sc">|&gt;</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># transpose for better readability</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">t</span>() <span class="sc">|&gt;</span>  </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scroll_box</span>(<span class="at">height =</span> <span class="st">"350px"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:350px; ">
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;"></th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;"></th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;"></th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">domain</td>
+<td style="text-align: left;">Verbal Skills in English (as Foreign Language)</td>
+<td style="text-align: left;">Verbal Skills in English (as Foreign Language)</td>
+<td style="text-align: left;">Verbal Skills in English (as Foreign Language)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">subdomain</td>
+<td style="text-align: left;">Text Reconstruction (C-Test)</td>
+<td style="text-align: left;">Text Reconstruction (C-Test)</td>
+<td style="text-align: left;">Text Reconstruction (C-Test)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">grade</td>
+<td style="text-align: left;">9</td>
+<td style="text-align: left;">9</td>
+<td style="text-align: left;">9</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">study</td>
+<td style="text-align: left;">DESI</td>
+<td style="text-align: left;">DESI</td>
+<td style="text-align: left;">DESI (Pooled)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">wave</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">model</td>
+<td style="text-align: left;">3l</td>
+<td style="text-align: left;">3l</td>
+<td style="text-align: left;">3l</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">icc_l2.est</td>
+<td style="text-align: left;">0.07484727</td>
+<td style="text-align: left;">0.09329552</td>
+<td style="text-align: left;">0.08274759</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">icc_l2.se</td>
+<td style="text-align: left;">0.009634811</td>
+<td style="text-align: left;">0.011132797</td>
+<td style="text-align: left;">0.007285329</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">icc_l3.est</td>
+<td style="text-align: left;">0.5839861</td>
+<td style="text-align: left;">0.5519840</td>
+<td style="text-align: left;">0.5687772</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">icc_l3.se</td>
+<td style="text-align: left;">0.01762045</td>
+<td style="text-align: left;">0.01851544</td>
+<td style="text-align: left;">0.01276421</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">r2_l1_pretest.est</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">0.4270869</td>
+<td style="text-align: left;">0.4270869</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">r2_l1_pretest.se</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">0.007683032</td>
+<td style="text-align: left;">0.007683032</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">r2_l2_pretest.est</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">0.8440895</td>
+<td style="text-align: left;">0.8440895</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">r2_l2_pretest.se</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">0.01575307</td>
+<td style="text-align: left;">0.01575307</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">r2_l3_pretest.est</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">0.998872</td>
+<td style="text-align: left;">0.998872</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">r2_l3_pretest.se</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">0.0006166911</td>
+<td style="text-align: left;">0.0006166911</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">r2_l1_ses.est</td>
+<td style="text-align: left;">0.01315652</td>
+<td style="text-align: left;">0.01675238</td>
+<td style="text-align: left;">0.01483982</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">r2_l1_ses.se</td>
+<td style="text-align: left;">0.002402910</td>
+<td style="text-align: left;">0.002561325</td>
+<td style="text-align: left;">0.001752443</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">r2_l2_ses.est</td>
+<td style="text-align: left;">0.6742777</td>
+<td style="text-align: left;">0.6423608</td>
+<td style="text-align: left;">0.6577857</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">r2_l2_ses.se</td>
+<td style="text-align: left;">0.09820881</td>
+<td style="text-align: left;">0.09497836</td>
+<td style="text-align: left;">0.06827333</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">r2_l3_ses.est</td>
+<td style="text-align: left;">0.8845148</td>
+<td style="text-align: left;">0.9068157</td>
+<td style="text-align: left;">0.8968653</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">r2_l3_ses.se</td>
+<td style="text-align: left;">0.01972262</td>
+<td style="text-align: left;">0.01770283</td>
+<td style="text-align: left;">0.01317418</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">r2_l1_pretestses.est</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">0.4306028</td>
+<td style="text-align: left;">0.4306028</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">r2_l1_pretestses.se</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">0.007663661</td>
+<td style="text-align: left;">0.007663661</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">r2_l2_pretestses.est</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">0.8838199</td>
+<td style="text-align: left;">0.8838199</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">r2_l2_pretestses.se</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">0.01990558</td>
+<td style="text-align: left;">0.01990558</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">r2_l3_pretestses.est</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">0.9993725</td>
+<td style="text-align: left;">0.9993725</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">r2_l3_pretestses.se</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">0.000219044</td>
+<td style="text-align: left;">0.000219044</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+</div>
+</div>
+<p>As can be seen, there are three entries for English text reconstruction as the respective test was administered to students at two time points in the DESI study, namely at the beginning and at the end of grade 9. For the beginning of grade 9, no pretests were available, therefore the corresponding cells are set to <code>NA</code>. A third set of estimates is provided here that contains the meta-analytically pooled results across these two time points (as indicated by ‘DESI (Pooled)’). Note that this integration strategy (applying a fixed effect model approach) was also adopted for other domains in grade 9 in case multiple design parameters were available (as obtained either from several studies [as indicated by ‘All (Pooled)’] or from the two time points in DESI).</p>
+</section>
+</section>
+<section id="advanced-covariate-selection-for-single--and-multilevel-designs" class="level2">
+<h2 class="anchored" data-anchor-id="advanced-covariate-selection-for-single--and-multilevel-designs">Advanced Covariate Selection for Single- and Multilevel Designs</h2>
+<p>Well-chosen covariates can dramatically boost power and precision in both IRTs and CRTs. Recently, we generated an extensive compilation of single- and multilevel <em>R</em><sup>2</sup> (and ρ) values for student achievement <span class="citation" data-cites="stallasch2023">(<a href="#ref-stallasch2023" role="doc-biblioref">Stallasch et al., 2023</a>)</span>. Alongside three psychometric heuristics, we analyzed (a) covariate types of varying bandwidth-fidelity, (b) covariate combinations to quantify incremental validities , and (c) covariate time lags of 1–7 years to test potential validity degradation in the covariates. We meta-analyzed the estimates from six quasi-representative German samples, covering various outcome domains and the entire school career. We also used the estimates to simulate precision. We won’t use these design parameters in the present workshop. However, feel free to check out our <a href="https://osf.io/preprints/psyarxiv/5ajmg">preprint</a> and the corresponding Online Supplemental Material for manifold illustrative scenarios of study planning.</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-line-spacing="2" role="list">
+<div id="ref-stallasch2021" class="csl-entry" role="listitem">
+Stallasch, S. E., Lüdtke, O., Artelt, C., &amp; Brunner, M. (2021). Multilevel Design Parameters to Plan Cluster-Randomized Intervention Studies on Student Achievement in Elementary and Secondary School. <em>Journal of Research on Educational Effectiveness</em>, <em>14</em>(1), 172–206. <a href="https://doi.org/10.1080/19345747.2020.1823539">https://doi.org/10.1080/19345747.2020.1823539</a>
+</div>
+<div id="ref-stallasch2023" class="csl-entry" role="listitem">
+Stallasch, S. E., Lüdtke, O., Artelt, C., Hedges, L. V., &amp; Brunner, M. (2023). <em>Single- and multilevel perspectives on covariate selection in randomized intervention studies on student achievement</em>. <a href="http://dx.doi.org/10.31234/osf.io/5ajmg">http://dx.doi.org/10.31234/osf.io/5ajmg</a>
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
