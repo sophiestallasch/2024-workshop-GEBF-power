@@ -12,8 +12,6 @@ website:
       - single-level.qmd
       - multilevel.qmd
 
-editor: 
-  mode: source
       
 bibliography: references.bib
 csl: apa.csl

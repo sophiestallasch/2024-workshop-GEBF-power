@@ -38,7 +38,6 @@ After having proven the general efficacy of the apps's underlying didactic appro
 
 ### Scenario 1: Finding the Minimum Required Sample Size for a 3L-CRT
 
-
 The research team would like to conduct a 3L-CRT to test whether the app fosters 7th graders reading comprehension in German as first language. According to Table 1 in @brunner2023, students in Germany typically show learning gains of *d* = .27 in their reading skills from Grade 6 to Grade 7. Since the app was programmed with a special focus on reading, the researchers expect to find at least a treatment effect that corresponds to an achievement growth across half a school year. The researchers therefore wonder how an efficient study design which is sensitive to detect *MDES* = .13 at α = .05 in a two-tailed *t*-test would look like. The research team performs power analyses to find the required number of schools, under the assumption to sample (on average) 3 classrooms of 20 students from every school.
 
 #### Formula
@@ -47,20 +46,20 @@ The number of schools $K$ necessary for a 3L-CRT with randomization/treatment as
 
 with
 
-| Parameter          | Definition                                                                                         | PowerUpR argument   |
-|----------|---------------------------------------|-------------------|
+| Parameter          | Definition                                                                                         | PowerUpR argument                          |
+|--------------------|----------------------------------------------------------------------------------------------------|--------------------------------------------|
 | $M_{K-g^*_{L3}-2}$ | multiplier for a two-tailed test $t_{\alpha/2}+t_{1-\beta}$ with $K-g^*_{L3}-2$ degrees of freedom | `power=.80`, `alpha=.05`,`two.tailed=TRUE` |
-| $MDES$             | minimum detectable effect size                                                                     | `es=.25`                          |
-| $n$                | mean number of students per classroom                                                     | `n`                           |
-| $J$                | mean number of classrooms per school                                                      | `J`                           |
-| $K$                | total number of schools                                                                            | `K`                           |
-| $P$                | proportion of sample assigned to treatment  $K_{TG}/K$                                          | `p=.50`                           |
-| $g^*_{L3}$         | number of school-level covariates                                                                  | `g3=0`                          |
-| $\rho_{L2}$        | achievement differences between classrooms                                                         | `rho2`                        |
-| $\rho_{L3}$        | achievement differences between schools                                                            | `rho3`                        |
-| $R^2_{L1}$         | explained variance at the student level                                                            | `r21=0`                         |
-| $R^2_{L2}$         | explained variance at the classroom level                                                          | `r22=0`                         |
-| $R^2_{L3}$         | explained variance at the school level                                                             | `r23=0`                         |
+| $MDES$             | minimum detectable effect size                                                                     | `es=.25`                                   |
+| $n$                | mean number of students per classroom                                                              | `n`                                        |
+| $J$                | mean number of classrooms per school                                                               | `J`                                        |
+| $K$                | total number of schools                                                                            | `K`                                        |
+| $P$                | proportion of sample assigned to treatment $K_{TG}/K$                                              | `p=.50`                                    |
+| $g^*_{L3}$         | number of school-level covariates                                                                  | `g3=0`                                     |
+| $\rho_{L2}$        | achievement differences between classrooms                                                         | `rho2`                                     |
+| $\rho_{L3}$        | achievement differences between schools                                                            | `rho3`                                     |
+| $R^2_{L1}$         | explained variance at the student level                                                            | `r21=0`                                    |
+| $R^2_{L2}$         | explained variance at the classroom level                                                          | `r22=0`                                    |
+| $R^2_{L3}$         | explained variance at the school level                                                             | `r23=0`                                    |
 
 #### Design Parameters
 
@@ -107,6 +106,7 @@ d1.0 <- mrss.cra3(power=.80, alpha=.05, two.tailed=TRUE,
                   rho3 = dp_s1$icc_l3.est, 
                   g3 = 0, r21 = 0, r22 = 0, r23 = 0)
 ```
+
 Note that the arguments `K0` and `tol` denote the starting value and stopping tolerance for determining K, respectively. `K0=10` and `tol=.10` are the default values.
 
 ##### Covariate adjustment: Conditional design with...
@@ -264,6 +264,7 @@ n <- seq(21, 30, 1)
 # without a pretest
 d1.5 <- map_dbl(n, custom_mrss.cra3) |> set_names(n)
 ```
+
 ```{r}
 # with a pretest
 d1.6 <- map_dbl(n, ~custom_mrss.cra3(n = ., pretest=TRUE)) |>  set_names(n)
@@ -360,13 +361,26 @@ Research Team 2 would like to conduct a 2L-CRT on the effectiveness of a curricu
 2.  Use the `mrss.cra2()` function to compute how many schools are necessary to detect a standardized treatment effect of *d* = .15 with confidence (i.e., α = .05, two-tailed, 1-β = .80).
 
 3.  All else held constant, what happens when...
-- (a) increasing power from 80% to 90%?
-- (b) adding sociodemographics as covariates (over and above the included math pretest) at the school level only, and both at the school and student level?
-- (c) no covariates are used? 
-- (d) larger between-school achievement differences of ρ~L3~ = .20 are assumed?
-- (e) taking statistical uncertainty into account to opt for a conservative or a liberal approach?
 
-  
+-   
+
+    (a) increasing power from 80% to 90%?
+
+-   
+
+    (b) adding sociodemographics as covariates (over and above the included math pretest) at the school level only, and both at the school and student level?
+
+-   
+
+    (c) no covariates are used?
+
+-   
+
+    (d) larger between-school achievement differences of ρ~L3~ = .20 are assumed?
+
+-   
+
+    (e) taking statistical uncertainty into account to opt for a conservative or a liberal approach?
 
 # R Code Solutions
 
@@ -491,7 +505,7 @@ mrss.cra2(es = .15, n = 40,
 Research Team 3 plans a 3L-CRT to study the impact of an intervention that is intended to affect students’ history achievement across Grades 5 to 12 in (non-academic track) comprehensive secondary schools. Due to budgetary constraints, a fixed maximum number of 40 schools (with 2 classrooms, and 20 students each) are at the researchers’ disposal. Given these limits, the primary concern of Team 3 is to ensure that the attainable *MDES* lies within the range of the effects on students’ achievement that is typically observed for this kind of intervention (i.e., 0.20 ≤ d ≤ 0.30, see @hill2008). Team 3 considers two designs: (1) a design without covariates, and (2) a design that adjusts for a pretest and 4 sociodemographics (i.e., students' gender and migration background, parents' educational attainment, and families' HISEI).
 
 ::: callout-tip
-In this Scenario, you should use the normative distributions of the design parameters. Recall, these data frames are indexed by the suffix "_ND".
+In this Scenario, you should use the normative distributions of the design parameters. Recall, these data frames are indexed by the suffix "\_ND".
 :::
 
 ::: panel-tabset
@@ -499,20 +513,25 @@ In this Scenario, you should use the normative distributions of the design param
 
 1.  With the aid of the flow chart, choose the appropriate design parameters from the `multides1` database.
 
-2. For small (25th percentile), medium (50th percentile), and large values (75th percentile) of ρ, use the `mdes.cra3()` function to compute the *MDES* which can be detected with confidence (i.e., α = .05 in a two-tailed test, 1-β = .80), given...
+2.  For small (25th percentile), medium (50th percentile), and large values (75th percentile) of ρ, use the `mdes.cra3()` function to compute the *MDES* which can be detected with confidence (i.e., α = .05 in a two-tailed test, 1-β = .80), given...
 
-- (a) a design without covariates.
-- (b) a design with adjustment for the full battery of covariates (i.e., 1 pretest plus 4 sociodemographics), using large values (75th percentile) of *R*^2^. 
+-   
 
-3. Try to visualize the results.
+    (a) a design without covariates.
 
-4. *Additional task*: Suppose that research Team 3 further wishes to analyze the intervention's effects in the academic track and on other (possibly domain-general) skills. Choose two or three other target domains for which @stallasch2021 provide design parameters for the academic track and perform power analyses to find the design that is most parsimonious in terms of sample size and possibly included covariates.
+-   
+
+    (b) a design with adjustment for the full battery of covariates (i.e., 1 pretest plus 4 sociodemographics), using large values (75th percentile) of *R*^2^.
+
+3.  Try to visualize the results.
+
+4.  *Additional task*: Suppose that research Team 3 further wishes to analyze the intervention's effects in the academic track and on other (possibly domain-general) skills. Choose two or three other target domains for which @stallasch2021 provide design parameters for the academic track and perform power analyses to find the design that is most parsimonious in terms of sample size and possibly included covariates.
 
 # R Code Solutions
+
 1.  With the aid of the flow chart, choose the appropriate design parameters from the `multides1` database.
 
-![](img/s3_3lcrt.png)
-Choose data frame B4.
+![](img/s3_3lcrt.png) Choose data frame B4.
 
 ```{r}
 dp_s3 <- multides1[["B4_Adjusted_ND"]] |>  
@@ -524,8 +543,7 @@ dp_s3 <- multides1[["B4_Adjusted_ND"]] |>
   set_names(c("statistic", "rho2", "rho3", "r21", "r22", "r23"))
 ```
 
-
-2. For small (25th percentile), medium (50th percentile), and large values (75th percentile) of the design parameters, use the `mdes.cra3()` function to compute the *MDES* which can be detected with confidence (i.e., α = .05 in a two-tailed test, 1-β = .80), given...
+2.  For small (25th percentile), medium (50th percentile), and large values (75th percentile) of the design parameters, use the `mdes.cra3()` function to compute the *MDES* which can be detected with confidence (i.e., α = .05 in a two-tailed test, 1-β = .80), given...
 
 ##### (a) a design without covariates.
 
@@ -546,15 +564,17 @@ custom_mdes.cra3 <- function(rho2, rho3, g3 = 0, r21 = 0, r22 = 0, r23 = 0, ...)
 ```
 
 Apply the function to compute the MDES for small, medium, and large intraclass correlations using `pmap()`
+
 ```{r}
 d3.a <- pmap(dp_s3 %>% select(contains("rho")), custom_mdes.cra3) %>% 
   set_names(dp_s3$statistic) %>% 
   bind_rows(.id = "statistic")
 ```
 
-
 ##### (b) a design with adjustment for the full battery of covariates (i.e., 1 pretest plus 4 sociodemographics), using large values (75th percentile) of *R*^2^.
+
 When adding covariates, Team 3 uses the large values for ρ (i.e., the 75th percentile) to apply a conservative approach.
+
 ```{r}
 # use the 75th percentile of the ICCs and adjust for 5 covariates (1 pretest + 4 sociodemographics)
 d3.b <- pmap(dp_s3 %>% 
@@ -566,12 +586,14 @@ d3.b <- pmap(dp_s3 %>%
   bind_rows(.id = "statistic")
 ```
 
-
-3. Try to visualize the results.
+3.  Try to visualize the results.
 
 ##### Plotting
 
-<details><summary>show code</summary>
+<details>
+
+<summary>show code</summary>
+
 ```{r, results='hide'}
 p <- ggplot(bind_rows(d3.a, d3.b, .id = "design") %>% 
               mutate(statistic = factor(statistic, 
@@ -596,15 +618,14 @@ p <- ggplot(bind_rows(d3.a, d3.b, .id = "design") %>%
            alpha = .2)
 p
 ```
+
 </details>
 
 ```{r, echo=F}
 p
 ```
-<p>&nbsp;</p>  
+
+<p> </p>
 
 Team 3 learns that the attainable *MDES* is `r round(d3.a$mdes[1], 2)`/`r round(d3.a$mdes[2], 2)`/`r round(d3.a$mdes[3], 2)` (point estimates) for small/medium/large values of ρ~L2~ and ρ~L3~. Including both a pretest and sociodemographics as covariates and using the 75th percentiles of the values for ρ~L2~ and ρ~L3~ (as more conservative upper bounds), the respective values for the MDES reduce to `r round(d3.b$mdes[1], 2)`/`r round(d3.b$mdes[2], 2)`/`r round(d3.b$mdes[3], 2)` for small/medium/large values of *R*^2^ at the various levels. Consequently, Team 3 can be quite confident that their CRT design offers sufficient sensitivity to detect a true intervention effect within the desired range when including both pretests and sociodemographics.
-
-
 :::
-
