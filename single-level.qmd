@@ -68,7 +68,7 @@ with
 
 The output looks like this:[^1]
 
-[^1]: In PowerUpR, the standardized standard error is calculated as $SSE=\sqrt{\frac{1-R^2}{P(1-P)n}}$, and is as such expressed as the ratio of the effect size (i.e., the *MDES*) to the noncentrality parameter $\lambda$: $SSE=\frac{MDES}{\lambda}$. Therefore, in PowerUpR, the noncentrality parameter $\lambda$ is equated with the multiplier $M_{n-g^*-2}$ [see e.g., @stallasch2023]. 
+[^1]: In PowerUpR, the standardized standard error is calculated as $SSE=\sqrt{\frac{1-R^2}{P(1-P)n}}$, and is as such expressed as the ratio of the effect size (i.e., the *MDES*) to the noncentrality parameter $\lambda$: $SSE=\frac{MDES}{\lambda}$. 
 
 ```{r}
 #| echo: false
